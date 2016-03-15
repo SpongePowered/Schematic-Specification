@@ -42,12 +42,12 @@ Field Name | Type | Description
 <a name="schematicWidth"></a>Width | `unsigned short` | **Required.** Specifies the width (the size of the area in the X-axis) of the schamatic.
 <a name="schematicHeight"></a>Height | `unsigned short` | **Required.** Specifies the height (the size of the area in the Y-axis) of the schamatic.
 <a name="schematicLength"></a>Length | `unsigned short` | **Required.** Specifies the length (the size of the area in the Z-axis) of the schamatic.
-<a name="schematicOffset"></a>Offset | [`integer`] | Specifies the relative offset of the schematic. This value is relative to the most minimal point in the schematics area. The default value if not provided is `[0, 0, 0]`. This may be used when incorperating the area of blocks defined by this schematic to a larger area to place the blocks relative to a selected point.
+<a name="schematicOffset"></a>Offset | `integer`[3] | Specifies the relative offset of the schematic. This value is relative to the most minimal point in the schematics area. The default value if not provided is `[0, 0, 0]`. This may be used when incorperating the area of blocks defined by this schematic to a larger area to place the blocks relative to a selected point.
 <a name="schematicPaletteLength"></a>PaletteLength | `integer` | **Required.** Specifies the size of the block palette.
 <a name="schematicPalette"></a>Palette | [Palette Object](#paletteObject) | **Required.** Specifies the block palette. This is a mapping of block states to indices which are local to this schematic. These indices are used to reference the block states from within the [BlockData array](#schematicBlockData). It is recommeneded for maximum data compression that your indices start at zero and skip no values. The maximum index cannot be greater than [`PaletteLength - 1`](#schematicPaletteLength).
 <a name="schematicBlockData"></a>BlockData | `byte[]` | **Required.** Specifies the main storage array which contains `Width * Height * Length` entries packed tightly within the array. Each entry refers to an index within the [Palette](#schematicPalette) and is `ceil(lg(PaletteLength-1))` bits in length (lg is the base 2 logarithm). The total data is padded to a multiple of 8 to fit within the byte array. The entries are indexed by `x + y * Width + z * Width * Height`.
-<a name="schematicTileEntities"></a>TileEntities | [[TileEntity Object](#tileEntityObject)] | Specifies additional data for blocks which require extra data. If no additional data is provided for a block which nornally requires extra data then it is assumed that the TileEntity for the block is initialized to its default state.
-<a name="schematicEntities"></a>Entities | [[Entity Object](#entityObject)] | Specifies any entities which exist within the area of this schematic.
+<a name="schematicTileEntities"></a>TileEntities | [TileEntity Object](#tileEntityObject)[] | Specifies additional data for blocks which require extra data. If no additional data is provided for a block which nornally requires extra data then it is assumed that the TileEntity for the block is initialized to its default state.
+<a name="schematicEntities"></a>Entities | [Entity Object](#entityObject)[] | Specifies any entities which exist within the area of this schematic.
 
 ##### More In-depth on the BlockData array
 
@@ -67,7 +67,7 @@ Field Name | Type | Description
 <a name="metadataName"></a>Name | `string` | The name of the schematic.
 <a name="metadataAuthor"></a>Author | `string` | The name of the author of the schematic.
 <a name="metadataDate"></a>Date | `string` | The date that this schematic was created on.
-<a name="metadataRequiredMods"></a>RequiredMods | [`string`] | An array of mod ids which have blocks which are referenced by this schematic's defined [Palette](#schematicPalette).
+<a name="metadataRequiredMods"></a>RequiredMods | `string`[] | An array of mod ids which have blocks which are referenced by this schematic's defined [Palette](#schematicPalette).
 
 ##### Metadata Object Example:
 
@@ -116,7 +116,7 @@ An object to specify a tile entity which is within the region. Tile entities are
 Field Pattern | Type | Description
 ---|:---:|---
 <a name="tileEntityVersion"></a>ContentVersion | `integer` | **Required.** A version identifier for the contents of this tile entity. Used for providing better backwards compatibility.
-<a name="tileEntityPos"></a>Pos | [`integer`] | **Required.** The position of the tile entity relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffsetX) applied). Must contain exactly 3 integer values.
+<a name="tileEntityPos"></a>Pos | `integer`[3] | **Required.** The position of the tile entity relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffsetX) applied). Must contain exactly 3 integer values.
 <a name="tileEntityId"></a>Id | `string` | **Required.** The id of the tile entity type defined by this Tile Entity Object. This should be used to identify which fields should be required for the definition of this type.
 
 ##### Tile Entity Object Example
@@ -144,7 +144,7 @@ An object to specify an entity which is within the region. The fields used to de
 Field Pattern | Type | Description
 ---|:---:|---
 <a name="entityVersion"></a>ContentVersion | `integer` | **Required.** A version identifier for the contents of this tile entity. Used for providing better backwords compatibility.
-<a name="entityPos"></a>Pos | [`double`] | **Required.** The position of the tile entity relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffsetX) applied). Must contain exactly 3 `double` values.
+<a name="entityPos"></a>Pos | `double`[3] | **Required.** The position of the tile entity relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffsetX) applied). Must contain exactly 3 `double` values.
 <a name="entityId"></a>Id | `string` | **Required.** The id of the entity type defined by this Entity Object. This should be used to identify which fields should be required for the definition of this type.
 
 ##### Entity Object Example
