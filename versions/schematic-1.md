@@ -12,7 +12,7 @@ This specification defines a format which describes a region of a [Minecraft](ht
 
 Version | Date | Notes
 --- | --- | ---
-1.0 | 2016-MM-DD | Initial release of the specification
+1 | 2016-MM-DD | Initial release of the specification
 
 ## Definitions
 
@@ -48,6 +48,13 @@ Field Name | Type | Description
 <a name="schematicBlockData"></a>BlockData | `byte[]` | **Required.** Specifies the main storage array which contains `Width * Height * Length` entries packed tightly within the array. Each entry refers to an index within the [Palette](#schematicPalette) and is `ceil(lg(PaletteLength-1))` bits in length (lg is the base 2 logarithm). The total data is padded to a multiple of 8 to fit within the byte array. The entries are indexed by `x + y * Width + z * Width * Height`.
 <a name="schematicTileEntities"></a>TileEntities | [[TileEntity Object](#tileEntityObject)] | Specifies additional data for blocks which require extra data. If no additional data is provided for a block which nornally requires extra data then it is assumed that the TileEntity for the block is initialized to its default state.
 <a name="schematicEntities"></a>Entities | [[Entity Object](#entityObject)] | Specifies any entities which exist within the area of this schematic.
+
+##### More In-depth on the BlockData array
+
+The data within the BlockData array is packed tightly, this means that the indices of bytes in the array are not the same as the indices of the entries. The index of a specific entry starts at
+the `(x + y * Width + z * Width * Height) * ceil(lg(PaletteLength-1))` bit (so divide by 8 for the byte index) and the entry may overlay multiple bytes in the array.
+
+For example with a `PaletteLength` of 8192 13 bits are required per entry. A `3x1x1` schematic would then have a BlockData array which resembles `[AAAAAAAA, AAAAABBB, BBBBBBBB, BBCCCCCC, CCCCCCC0]` where `A`, `B`, and `C` represent the bits that make up each 13-bit entry. The structure therefore takes up 5 bytes of space with 1 bit of padding on the end.
 
 #### <a name="metadataObject"></a> Metadata Object
 
@@ -108,7 +115,7 @@ An object to specify a tile entity which is within the region. Tile entities are
 
 Field Pattern | Type | Description
 ---|:---:|---
-<a name="tileEntityVersion"></a>ContentVersion | `integer` | **Required.** A version identifier for the contents of this tile entity. Used for providing better backwords compatibility.
+<a name="tileEntityVersion"></a>ContentVersion | `integer` | **Required.** A version identifier for the contents of this tile entity. Used for providing better backwards compatibility.
 <a name="tileEntityPos"></a>Pos | [`integer`] | **Required.** The position of the tile entity relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffsetX) applied). Must contain exactly 3 integer values.
 <a name="tileEntityId"></a>Id | `string` | **Required.** The id of the tile entity type defined by this Tile Entity Object. This should be used to identify which fields should be required for the definition of this type.
 
