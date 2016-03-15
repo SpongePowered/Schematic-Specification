@@ -66,7 +66,7 @@ Field Name | Type | Description
 ---|:---:|---
 <a name="metadataName"></a>Name | `string` | The name of the schematic.
 <a name="metadataAuthor"></a>Author | `string` | The name of the author of the schematic.
-<a name="metadataDate"></a>Date | `string` | The date that this schematic was created on.
+<a name="metadataDate"></a>Date | `string` | The date that this schematic was created on. It is recommended that this is specified using the [ISO 8601](https://www.cl.cam.ac.uk/~mgk25/iso-time.html) standard.
 <a name="metadataRequiredMods"></a>RequiredMods | `string`[] | An array of mod ids which have blocks which are referenced by this schematic's defined [Palette](#schematicPalette).
 
 ##### Metadata Object Example:
