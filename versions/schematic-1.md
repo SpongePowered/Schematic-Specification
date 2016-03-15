@@ -54,7 +54,7 @@ Field Name | Type | Description
 The data within the BlockData array is packed tightly, this means that the indices of bytes in the array are not the same as the indices of the entries. The index of a specific entry starts at
 the `(x + y * Width + z * Width * Height) * ceil(lg(PaletteLength-1))` bit (so divide by 8 for the byte index) and the entry may overlay multiple bytes in the array.
 
-For example with a `PaletteLength` of 8192 13 bits are required per entry. A `3x1x1` schematic would then have a BlockData array which resembles `[AAAAAAAA, AAAAABBB, BBBBBBBB, BBCCCCCC, CCCCCCC0]` where `A`, `B`, and `C` represent the bits that make up each 13-bit entry. The structure therefore takes up 5 bytes of space with 1 bit of padding on the end.
+For example, with a `PaletteLength` of 8192, 13 bits are required per entry. A `3x1x1` schematic would then have a BlockData array which resembles `[AAAAAAAA, AAAAABBB, BBBBBBBB, BBCCCCCC, CCCCCCC0]` where `A`, `B`, and `C` represent the bits that make up each 13-bit entry. The structure therefore takes up 5 bytes of space with 1 bit of padding on the end.
 
 #### <a name="metadataObject"></a> Metadata Object
 
@@ -88,7 +88,7 @@ An object which holds a mapping of a block state id to an index. The indices are
 
 #### Block State Ids
 
-The format of the Block State identifier is the id of the block type and a set of property `key=value` pairs surrounded by square brackets. If the block has no properties then they can be excluded. For example the air block has no properties so its id representation would be just the block type id `minecraft:air`. The planks block however has an enum property for the `variant` so its id would be `minecraft:planks[variant=oak]`.
+The format of the Block State identifier is the id of the block type and a set of comma-separated property `key=value` pairs surrounded by square brackets. If the block has no properties then they can be excluded. For example the air block has no properties so its id representation would be just the block type id `minecraft:air`. The planks block however has an enum property for the `variant` so its id would be `minecraft:planks[variant=oak]`.
 
 
 ##### Fields
