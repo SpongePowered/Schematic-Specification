@@ -1,29 +1,32 @@
 # Sponge Schematic Specification
 
-#### Version 1
+#### Version 1 Draft
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](http://www.ietf.org/rfc/rfc2119.txt).
 
 ## Introduction
 
-This specification defines a format which describes a region of a [Minecraft](http://minecraft.net) world for the purpose of serialization and storage of the region to disk. It is designed in order to allow maximum cross-compatibility between platforms, versions, and various states of modding.
+This specification defines a format which describes a region of a [Minecraft](http://minecraft.net) world for the purpose of serialization and storage of the region to disk. It is designed in order to allow maximum cross-compatibility between platforms, versions, and various states of modification.
 
 ## Revision History
 
 Version | Date | Notes
 --- | --- | ---
-1 | 2016-MM-DD | Initial release of the specification
+
 
 ## Definitions
 
 ##### <a name="defBlockState"></a>Block State
 A Block State is an instance of a block type with a set of extra data used to further define the material. The additional data varies by block type and a complete listing of vanilla types is available [here](http://minecraft.gamepedia.com/Block_states).
 
+##### <a name="defResourceLocation"></a>Resource Location
+Resources identified by a Resource Location have an identifier string which is made up of two sections, the domain and the resource name, written as `domain:name`. If the domain is not specified then it is assumed to be `minecraft`. For example `planks` would identify the same resource as `minecraft:planks` as the `minecraft:` prefix is implicit.
+
 ## Specification
 
 ### Format
 
-The the structure described by this specification is persisted to disk using the [Named Binary Tag](http://minecraft.gamepedia.com/NBT_format) (NBT) format. Before writing to disk the NBT data must be compressed using the [GZip](https://www.gnu.org/software/gzip/) data compression algorithm.
+The structure described by this specification is persisted to disk using the [Named Binary Tag](http://minecraft.gamepedia.com/NBT_format) (NBT) format. Before writing to disk the NBT data must be compressed using the [GZip](https://www.gnu.org/software/gzip/) data compression algorithm.
 
 All field names in the specification are **case sensitive**.
 
@@ -39,22 +42,22 @@ Field Name | Type | Description
 ---|:---:|---
 <a name="schematicVersion"></a>Version | `integer` | **Required.** Specified the format version being used. It may be used to provide validation and auto-conversion from older versions. The current version is `1`.
 <a name="schematicMetadata"></a>Metadata | [Metadata Object](#metadataObject) | Provides optional metadata about the schematic.
-<a name="schematicWidth"></a>Width | `unsigned short` | **Required.** Specifies the width (the size of the area in the X-axis) of the schamatic.
-<a name="schematicHeight"></a>Height | `unsigned short` | **Required.** Specifies the height (the size of the area in the Y-axis) of the schamatic.
-<a name="schematicLength"></a>Length | `unsigned short` | **Required.** Specifies the length (the size of the area in the Z-axis) of the schamatic.
-<a name="schematicOffset"></a>Offset | `integer`[3] | Specifies the relative offset of the schematic. This value is relative to the most minimal point in the schematics area. The default value if not provided is `[0, 0, 0]`. This may be used when incorperating the area of blocks defined by this schematic to a larger area to place the blocks relative to a selected point.
+<a name="schematicWidth"></a>Width | `unsigned short` | **Required.** Specifies the width (the size of the area in the X-axis) of the schematic.
+<a name="schematicHeight"></a>Height | `unsigned short` | **Required.** Specifies the height (the size of the area in the Y-axis) of the schematic.
+<a name="schematicLength"></a>Length | `unsigned short` | **Required.** Specifies the length (the size of the area in the Z-axis) of the schematic.
+<a name="schematicOffset"></a>Offset | `integer`[3] | Specifies the relative offset of the schematic. This value is relative to the most minimal point in the schematics area. The default value if not provided is `[0, 0, 0]`. This may be used when incorporating the area of blocks defined by this schematic to a larger area to place the blocks relative to a selected point.
 <a name="schematicPaletteLength"></a>PaletteLength | `integer` | **Required.** Specifies the size of the block palette.
 <a name="schematicPalette"></a>Palette | [Palette Object](#paletteObject) | **Required.** Specifies the block palette. This is a mapping of block states to indices which are local to this schematic. These indices are used to reference the block states from within the [BlockData array](#schematicBlockData). It is recommeneded for maximum data compression that your indices start at zero and skip no values. The maximum index cannot be greater than [`PaletteLength - 1`](#schematicPaletteLength).
 <a name="schematicBlockData"></a>BlockData | `byte[]` | **Required.** Specifies the main storage array which contains `Width * Height * Length` entries packed tightly within the array. Each entry refers to an index within the [Palette](#schematicPalette) and is `ceil(lg(PaletteLength-1))` bits in length (lg is the base 2 logarithm). The total data is padded to a multiple of 8 to fit within the byte array. The entries are indexed by `x + y * Width + z * Width * Height`.
-<a name="schematicTileEntities"></a>TileEntities | [TileEntity Object](#tileEntityObject)[] | Specifies additional data for blocks which require extra data. If no additional data is provided for a block which nornally requires extra data then it is assumed that the TileEntity for the block is initialized to its default state.
+<a name="schematicTileEntities"></a>TileEntities | [TileEntity Object](#tileEntityObject)[] | Specifies additional data for blocks which require extra data. If no additional data is provided for a block which normally requires extra data then it is assumed that the TileEntity for the block is initialized to its default state.
 <a name="schematicEntities"></a>Entities | [Entity Object](#entityObject)[] | Specifies any entities which exist within the area of this schematic.
 
 ##### More In-depth on the BlockData array
 
 The data within the BlockData array is packed tightly, this means that the indices of bytes in the array are not the same as the indices of the entries. The index of a specific entry starts at
-the `(x + y * Width + z * Width * Height) * ceil(lg(PaletteLength-1))` bit (so divide by 8 for the byte index) and the entry may overlay multiple bytes in the array.
+the `(x + y * Width + z * Width * Height) * ceil(lg(PaletteLength-1))` bit (so divide by 8 for the byte index) and the entry may overlay multiple bytes in the array.For example, with a `PaletteLength` of 8192, 13 bits are required per entry. A `3x1x1` schematic would then have a BlockData array which resembles `[AAAAAAAA, AAAAABBB, BBBBBBBB, BBCCCCCC, CCCCCCC0]` where `A`, `B`, and `C` represent the bits that make up each 13-bit entry. The structure therefore takes up 5 bytes of space with 1 bit of padding on the end.
 
-For example, with a `PaletteLength` of 8192, 13 bits are required per entry. A `3x1x1` schematic would then have a BlockData array which resembles `[AAAAAAAA, AAAAABBB, BBBBBBBB, BBCCCCCC, CCCCCCC0]` where `A`, `B`, and `C` represent the bits that make up each 13-bit entry. The structure therefore takes up 5 bytes of space with 1 bit of padding on the end.
+The `x/y/z` position used here is in the range of 0 to the Width/Height/Length depending on the axis. The `[0, 0, 0]` position is therefore the lowest most block in the x/y/z-axis with all other blocks extending in the positive directions from that point.
 
 #### <a name="metadataObject"></a> Metadata Object
 
@@ -88,8 +91,9 @@ An object which holds a mapping of a block state id to an index. The indices are
 
 #### Block State Ids
 
-The format of the Block State identifier is the id of the block type and a set of comma-separated property `key=value` pairs surrounded by square brackets. If the block has no properties then they can be excluded. For example the air block has no properties so its id representation would be just the block type id `minecraft:air`. The planks block however has an enum property for the `variant` so its id would be `minecraft:planks[variant=oak]`. Properties should be ordered with their keys in alphabetical ordering.
+The format of the Block State identifier is the id of the block type and a set of comma-separated property `key=value` pairs surrounded by square brackets. If the block has no properties then they can be excluded. The block type id is specified as a [Resource Location](#defResourceLocation).
 
+For example the air block has no properties so its id representation would be just the block type id `minecraft:air`. The planks block however has an enum property for the `variant` so its id would be `minecraft:planks[variant=oak]`. Properties should be ordered with their keys in alphabetical ordering.
 
 ##### Fields
 
@@ -116,8 +120,8 @@ An object to specify a tile entity which is within the region. Tile entities are
 Field Pattern | Type | Description
 ---|:---:|---
 <a name="tileEntityVersion"></a>ContentVersion | `integer` | **Required.** A version identifier for the contents of this tile entity. Used for providing better backwards compatibility.
-<a name="tileEntityPos"></a>Pos | `integer`[3] | **Required.** The position of the tile entity relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffsetX) applied). Must contain exactly 3 integer values.
-<a name="tileEntityId"></a>Id | `string` | **Required.** The id of the tile entity type defined by this Tile Entity Object. This should be used to identify which fields should be required for the definition of this type.
+<a name="tileEntityPos"></a>Pos | `integer`[3] | **Required.** The position of the tile entity relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffset) applied). Must contain exactly 3 integer values.
+<a name="tileEntityId"></a>Id | `string` | **Required.** The id of the tile entity type defined by this Tile Entity Object, specified as a [Resource Location](#defResourceLocation). This should be used to identify which fields should be required for the definition of this type.
 
 ##### Tile Entity Object Example
 
@@ -144,8 +148,8 @@ An object to specify an entity which is within the region. The fields used to de
 Field Pattern | Type | Description
 ---|:---:|---
 <a name="entityVersion"></a>ContentVersion | `integer` | **Required.** A version identifier for the contents of this tile entity. Used for providing better backwords compatibility.
-<a name="entityPos"></a>Pos | `double`[3] | **Required.** The position of the tile entity relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffsetX) applied). Must contain exactly 3 `double` values.
-<a name="entityId"></a>Id | `string` | **Required.** The id of the entity type defined by this Entity Object. This should be used to identify which fields should be required for the definition of this type.
+<a name="entityPos"></a>Pos | `double`[3] | **Required.** The position of the tile entity relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffset) applied). Must contain exactly 3 `double` values.
+<a name="entityId"></a>Id | `string` | **Required.** The id of the entity type defined by this Entity Object, specified as a [Resource Location](#defResourceLocation). This should be used to identify which fields should be required for the definition of this type.
 
 ##### Entity Object Example
 
