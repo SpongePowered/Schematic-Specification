@@ -46,18 +46,11 @@ Field Name | Type | Description
 <a name="schematicHeight"></a>Height | `unsigned short` | **Required.** Specifies the height (the size of the area in the Y-axis) of the schematic.
 <a name="schematicLength"></a>Length | `unsigned short` | **Required.** Specifies the length (the size of the area in the Z-axis) of the schematic.
 <a name="schematicOffset"></a>Offset | `integer`[3] | Specifies the relative offset of the schematic. This value is relative to the most minimal point in the schematics area. The default value if not provided is `[0, 0, 0]`. This may be used when incorporating the area of blocks defined by this schematic to a larger area to place the blocks relative to a selected point.
-<a name="schematicPaletteMax"></a>PaletteMax | `integer` | **Required.** Specifies the size of the block palette.
+<a name="schematicPaletteMax"></a>PaletteMax | `integer` | Specifies the size of the block palette in number of bytes needed for the maximum palette index. Implementations may use this as a hint for the case that the palette data fits within a datatype smaller than a 32-bit integer that they may allocate a smaller sized array.
 <a name="schematicPalette"></a>Palette | [Palette Object](#paletteObject) | **Required.** Specifies the block palette. This is a mapping of block states to indices which are local to this schematic. These indices are used to reference the block states from within the [BlockData array](#schematicBlockData). It is recommeneded for maximum data compression that your indices start at zero and skip no values. The maximum index cannot be greater than [`PaletteMax - 1`](#schematicPaletteMax).
-<a name="schematicBlockData"></a>BlockData | `byte[]` | **Required.** Specifies the main storage array which contains `Width * Height * Length` entries packed tightly within the array. Each entry refers to an index within the [Palette](#schematicPalette) and is `ceil(lg(PaletteMax-1))` bits in length (lg is the base 2 logarithm). The total data is padded to a multiple of 8 to fit within the byte array. The entries are indexed by `x + y * Width + z * Width * Height`.
+<a name="schematicBlockData"></a>BlockData | `varint[]` | **Required.** Specifies the main storage array which contains `Width * Height * Length` entries. Each entry is specified as a varint and refers to an index within the [Palette](#schematicPalette). The entries are indexed by `x + y * Width + z * Width * Height`.
 <a name="schematicTileEntities"></a>TileEntities | [TileEntity Object](#tileEntityObject)[] | Specifies additional data for blocks which require extra data. If no additional data is provided for a block which normally requires extra data then it is assumed that the TileEntity for the block is initialized to its default state.
 <a name="schematicEntities"></a>Entities | [Entity Object](#entityObject)[] | Specifies any entities which exist within the area of this schematic.
-
-##### More In-depth on the BlockData array
-
-The data within the BlockData array is packed tightly, this means that the indices of bytes in the array are not the same as the indices of the entries. The index of a specific entry starts at
-the `(x + y * Width + z * Width * Height) * ceil(lg(PaletteMax-1))` bit (so divide by 8 for the byte index) and the entry may overlay multiple bytes in the array.For example, with a `PaletteMax` of 8192, 13 bits are required per entry. A `3x1x1` schematic would then have a BlockData array which resembles `[AAAAAAAA, AAAAABBB, BBBBBBBB, BBCCCCCC, CCCCCCC0]` where `A`, `B`, and `C` represent the bits that make up each 13-bit entry. The structure therefore takes up 5 bytes of space with 1 bit of padding on the end.
-
-The `x/y/z` position used here is in the range of 0 to the Width/Height/Length depending on the axis. The `[0, 0, 0]` position is therefore the lowest most block in the x/y/z-axis with all other blocks extending in the positive directions from that point.
 
 #### <a name="metadataObject"></a> Metadata Object
 
