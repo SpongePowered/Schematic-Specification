@@ -131,29 +131,3 @@ An example of possible storage of a sign. See the [Minecraft Chunk Format](http:
     "Text4": ""
 }
 ```
-
-#### <a name="entityObject"></a> Entity Object
-
-An object to specify an entity which is within the region. The fields used to describe a tile entity vary for each type, however the structure will be the same as used by the [Minecraft Chunk Format](http://minecraft.gamepedia.com/Chunk_format#Entity_format).
-
-##### Fields
-
-Field Pattern | Type | Description
----|:---:|---
-<a name="entityVersion"></a>ContentVersion | `integer` | **Required.** A version identifier for the contents of this tile entity. Used for providing better backwords compatibility.
-<a name="entityPos"></a>Pos | `double`[3] | **Required.** The position of the tile entity relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffset) applied). Must contain exactly 3 `double` values.
-<a name="entityId"></a>Id | `string` | **Required.** The id of the entity type defined by this Entity Object, specified as a [Resource Location](#defResourceLocation). This should be used to identify which fields should be required for the definition of this type.
-
-##### Entity Object Example
-
-An example of possible storage of a falling sand entity. See the [Minecraft Chunk Format](http://minecraft.gamepedia.com/Chunk_format#Entity_format) for a complete listing of data used to store various types of entities present in vanilla minecraft. Mods may store additional data or have additional types of entities.
-
-```js
-{
-    "ContentVersion": 0,
-    "Pos": [0.3, 1.6, 0.3],
-    "Id": "minecraft:FallingSand",
-    "Block": "minecraft:sand",
-    "Time": 43
-}
-```
