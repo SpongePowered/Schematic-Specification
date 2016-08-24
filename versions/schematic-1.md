@@ -1,6 +1,6 @@
 # Sponge Schematic Specification
 
-#### Version 1 Draft
+#### Version 1
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](http://www.ietf.org/rfc/rfc2119.txt).
 
@@ -12,6 +12,7 @@ This specification defines a format which describes a region of a [Minecraft](ht
 
 Version | Date | Notes
 --- | --- | ---
+1 | 2016-08-23 | Initial Version
 
 
 ## Definitions
