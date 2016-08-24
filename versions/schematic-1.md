@@ -46,8 +46,8 @@ Field Name | Type | Description
 <a name="schematicHeight"></a>Height | `unsigned short` | **Required.** Specifies the height (the size of the area in the Y-axis) of the schematic.
 <a name="schematicLength"></a>Length | `unsigned short` | **Required.** Specifies the length (the size of the area in the Z-axis) of the schematic.
 <a name="schematicOffset"></a>Offset | `integer`[3] | Specifies the relative offset of the schematic. This value is relative to the most minimal point in the schematics area. The default value if not provided is `[0, 0, 0]`. This may be used when incorporating the area of blocks defined by this schematic to a larger area to place the blocks relative to a selected point.
-<a name="schematicPaletteMax"></a>PaletteMax | `integer` | **Required.** Specifies the size of the block palette in number of bytes needed for the maximum palette index. Implementations may use this as a hint for the case that the palette data fits within a datatype smaller than a 32-bit integer that they may allocate a smaller sized array.
-<a name="schematicPalette"></a>Palette | [Palette Object](#paletteObject) | **Required.** Specifies the block palette. This is a mapping of block states to indices which are local to this schematic. These indices are used to reference the block states from within the [BlockData array](#schematicBlockData). It is recommeneded for maximum data compression that your indices start at zero and skip no values. The maximum index cannot be greater than [`PaletteMax - 1`](#schematicPaletteMax).
+<a name="schematicPaletteMax"></a>PaletteMax | `integer` | Specifies the size of the block palette in number of bytes needed for the maximum palette index. Implementations may use this as a hint for the case that the palette data fits within a datatype smaller than a 32-bit integer that they may allocate a smaller sized array.
+<a name="schematicPalette"></a>Palette | [Palette Object](#paletteObject) | Specifies the block palette. This is a mapping of block states to indices which are local to this schematic. These indices are used to reference the block states from within the [BlockData array](#schematicBlockData). It is recommeneded for maximum data compression that your indices start at zero and skip no values. The maximum index cannot be greater than [`PaletteMax - 1`](#schematicPaletteMax). While not required it is **highly** recommended that you include a palette in order to tightly pack the block ids included in the data array.
 <a name="schematicBlockData"></a>BlockData | `varint[]` | **Required.** Specifies the main storage array which contains `Width * Height * Length` entries. Each entry is specified as a varint and refers to an index within the [Palette](#schematicPalette). The entries are indexed by `x + z * Width + y * Width * Length`.
 <a name="schematicTileEntities"></a>TileEntities | [TileEntity Object](#tileEntityObject)[] | Specifies additional data for blocks which require extra data. If no additional data is provided for a block which normally requires extra data then it is assumed that the TileEntity for the block is initialized to its default state.
 
@@ -61,7 +61,7 @@ Field Name | Type | Description
 ---|:---:|---
 <a name="metadataName"></a>Name | `string` | The name of the schematic.
 <a name="metadataAuthor"></a>Author | `string` | The name of the author of the schematic.
-<a name="metadataDate"></a>Date | `string` | The date that this schematic was created on. It is recommended that this is specified using the [ISO 8601](https://www.cl.cam.ac.uk/~mgk25/iso-time.html) standard.
+<a name="metadataDate"></a>Date | `long` | The date that this schematic was created on. This is specified as milliseconds since the Unix epoch.
 <a name="metadataRequiredMods"></a>RequiredMods | `string`[] | An array of mod ids which have blocks which are referenced by this schematic's defined [Palette](#schematicPalette).
 
 ##### Metadata Object Example:
@@ -79,7 +79,7 @@ Field Name | Type | Description
 
 #### <a name="paletteObject"></a>Palette Object
 
-An object which holds a mapping of a block state id to an index. The indices are recommended to start at `0` and may be no more than [`PaletteMax - 1`](#schematicPaletteMax).
+An object which holds a mapping of a block state id to an index. The indices are recommended to start at `0` and may be no more than [`PaletteMax - 1`](#schematicPaletteMax). If the palette is not specified then the global mapping of ids is used instead. This is not recommended as it both expands the size of your blockdata and removes cross server and cross version compatibility for modded blocks which may change ids due to a variety of reasons.
 
 #### Block State Ids
 
