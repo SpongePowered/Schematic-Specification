@@ -1,4 +1,4 @@
-**This is under development**
+**This specification is under development**
 # Sponge Schematic Specification
 
 **Version 2**
@@ -171,7 +171,7 @@ Following changes has been made compared to version 1:
 * Changed [BlockData](#schematicBlockData) from `varint[]` to `int[]` or `long[]` to support even bigger areas and because **NBT has no varint or varlong definition**.
 * Changed [Width](#schematicWidth), [Height](#schematicHeight), [Length](#schematicLength) from `unsigned short` to `unsigned integer` to support even **bigger areas**-
 * Changed [PaletteMax](#schematicPaletteMax) from `integer` to `byte`, because **8 would be the maximum** possible value for Java implementations (64-bit long)
-* Added [Entity](#schematicEntity) field to **support entities**.
+* Added [Entity](#entityObject) field to **support entities**.
 * Changed [Date](#metadataDate) from miliseconds to seconds to the default **UNIX timestamp**, to cover a longer time range and because noone needs miliseconds.
 
 ### Other changes
