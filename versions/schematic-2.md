@@ -45,7 +45,7 @@ Field Name | Type | Description
 <a name="schematicWidth"></a>Width | `unsigned integer` | **Required.** Specifies the width (the amount of blocks along the X-axis) of the schematic. This shall be saved as [NBT](#formFile) tag int.
 <a name="schematicHeight"></a>Height | `unsigned integer` | **Required.** Specifies the height (the amount of blocks along the Y-axis) of the schematic. This shall be saved as [NBT](#formFile) tag int.
 <a name="schematicLength"></a>Length | `unsigned integer` | **Required.** Specifies the length (the amount of blocks along the Z-axis) of the schematic. This shall be saved as [NBT](#formFile) tag int.
-<a name="schematicOffset"></a>Offset | `unsigned integer[3]` | **Optional** Specifies the relative offset of the schematic. This value is relative to the most minimal point in the schematics area. If present, this offset will be added to all blocks, tiles and entities when pasting it into the world (may be even negative). This shall be saved as [NBT](#formFile) tag int array.
+<a name="schematicOffset"></a>Offset | `unsigned integer[3]` | **Optional** Specifies the relative offset of the schematic. This value is relative to the most minimal point in the schematics area. If present, this offset will be added to all blocks, tiles and entities when pasting it into the world (may be negative). This shall be saved as [NBT](#formFile) tag int array.
 <a name="schematicPaletteMax"></a>PaletteMax | `byte` | **Required** Specifies the size of the block palette index in number of bytes needed for the maximum palette index. Implementations must use this to determine, which index format will be needed. The palette index may fit within a datatype smaller than a 32-bit integer or even a longer datatype like 64-bit integer. This shall be saved as [NBT](#formFile) tag byte.
 <a name="schematicPalette"></a>Palette | [Palette Object](#paletteObject)[] | **Required** Specifies the block palette. This is a mapping of block states to indices which are local to this schematic. The array element indices are used to reference the block states from within the [BlockData array](#schematicBlockData). The maximum index cannot be greater than [`2^(PaletteMax * 8) - 1`](#schematicPaletteMax).  This shall be saved as [NBT](#formFile) tag list of [NBT](#formFile) tag string.
 <a name="schematicBlockData"></a>BlockData | `int[]` or `long[]` | **Required.** Specifies the main storage array which contains `Width * Height * Length` entries. Each entry is specified as a `int` or `long`, depending on the given [PaletteMax](#schematicPaletteMax) (1 to 4 bytes = int; 5 to 8 bytes = long). This index refers to the array element index within the [Palette](#schematicPalette). The entries are indexed by `x + z * Width + y * Width * Length`. This shall be saved as [NBT](#formFile) tag int array or [NBT](#formFile) tag long array.
@@ -97,9 +97,9 @@ For example the air block has no properties so its representation would be just 
 
 ```js
 "Palette" [
-    "a_mod:custom",
     "minecraft:air",
-    "minecraft:planks[variant=oak]"
+    "minecraft:planks[variant=oak]",
+    "a_mod:custom"
 ]
 ```
 
@@ -167,12 +167,12 @@ Following changes has been made compared to version 1:
 
 ### Functional changes
 
-* Changed Palette from `object` with ids to a `list` with ids, so you can easily calculate an index and **access it directly without searching**.
-* Changed BlockData from `varint[]` to `int[]` or `long[]` to support even bigger areas and because **NBT has no varint or varlong definition**.
-* Changed Width, Height, Length from `unsigned short` to `unsigned integer` to support even **bigger areas**-
-* Changed PaletteMax from `integer` to `byte`, because **8 would be the maximum** possible value for Java implementations (64-bit long)
-* Added Entity field to **support entities**.
-* Changed Date from miliseconds to seconds to the default **UNIX timestamp**, to cover a longer time range and because noone needs miliseconds.
+* Changed [Palette](#schematicPalette) from `object` with key as ids and value as index to a `list` with ids, so you can easily calculate an index and **access it directly without searching**.
+* Changed [BlockData](#schematicBlockData) from `varint[]` to `int[]` or `long[]` to support even bigger areas and because **NBT has no varint or varlong definition**.
+* Changed [Width](#schematicWidth), [Height](#schematicHeight), [Length](#schematicLength) from `unsigned short` to `unsigned integer` to support even **bigger areas**-
+* Changed [PaletteMax](#schematicPaletteMax) from `integer` to `byte`, because **8 would be the maximum** possible value for Java implementations (64-bit long)
+* Added [Entity](#schematicEntity) field to **support entities**.
+* Changed [Date](#metadataDate) from miliseconds to seconds to the default **UNIX timestamp**, to cover a longer time range and because noone needs miliseconds.
 
 ### Other changes
 
