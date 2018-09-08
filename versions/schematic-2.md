@@ -41,6 +41,7 @@ This is the nameless root object of the schematic. It shall be a [NBT](#formFile
 Field Name | Type | Description
 ---|:---:|---
 <a name="schematicVersion"></a>Version | `NBT int` | **Required.** Specified the format version being used. It may be used to provide validation and auto-conversion from older versions. The current version is `2`. This shall be saved as [NBT](#formFile) tag int.
+<a name="schematicContentVersion"></a>ContentVersion | `NBT int` | **Required.** A version identifier for the contents. Representing the minecraft version, when serialized. Used for providing backwards compatibility. [Values are specified by Mojang](https://minecraft-de.gamepedia.com/Versionen#Version-IDs). Mojangs data converter for older versions will need this value for proper conversion. This shall be saved as [NBT](#formFile) tag int.
 <a name="schematicMetadata"></a>Metadata | [Metadata Object](#metadataObject) as `NBT compound` | **Optional** Provides metadata about the schematic. This shall be saved as [NBT](#formFile) tag compound.
 <a name="schematicWidth"></a>Width | `NBT int` | **Required.** Specifies the width (the amount of blocks along the X-axis) of the schematic, must be interpreted as unsigned. This shall be saved as [NBT](#formFile) tag int.
 <a name="schematicHeight"></a>Height | `NBT int` | **Required.** Specifies the height (the amount of blocks along the Y-axis) of the schematic, must be interpreted as unsigned. This shall be saved as [NBT](#formFile) tag int.
@@ -111,7 +112,6 @@ An object to specify a tile entity which is within the area. Tile entities are u
 
 Field Pattern | Type | Description
 ---|:---:|---
-<a name="tileEntityVersion"></a>ContentVersion | `integer` | **Required.** A version identifier for this tile entity, representing the minecraft version, when serialized. Used for providing better backwards compatibility. [Values are specified by Mojang](https://minecraft-de.gamepedia.com/Versionen#Version-IDs). This shall be saved as [NBT](#formFile) tag int.
 <a name="tileEntityPos"></a>Pos | `unsigned integer[3]` | **Required.** The position of the tile entity relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffset) applied). Must contain exactly 3 integer values. This shall be saved as [NBT](#formFile) tag int array.
 <a name="tileEntityId"></a>Id | `string` | **Required.** The id of the tile entity type defined by this tile entity object, specified as a resource location. This should be used to identify which fields should be required for the definition of this type. This shall be saved as [NBT](#formFile) tag string.
 <a name="tileEntityProp"></a>{additional properties} | `<?>` | Amount and format of additional fields depending on the tile entity.
@@ -140,7 +140,6 @@ An object to specify all entitys which are within the area. Entities are used by
 
 Field Pattern | Type | Description
 ---|:---:|---
-<a name="entityVersion"></a>ContentVersion | `integer` | **Required.** A version identifier for this entity, representing the minecraft version, when serialized. Used for providing better backwards compatibility. [Values are specified by Mojang](https://minecraft-de.gamepedia.com/Versionen#Version-IDs). This shall be saved as [NBT](#formFile) tag int.
 <a name="entityPos"></a>Pos | `double[3]` | **Required.** The position of the entity relative to the `[0.0, 0.0, 0.0]` position of the schematic (without the [offset](#schematicOffset) applied). Must contain exactly 3 double values. This shall be saved as [NBT](#formFile) tag list of [NBT](#formFile) tag double.
 <a name="entityId"></a>Id | `string` | **Required.** The id of the entity type, specified as a resource location. This should be used to identify which fields should be required for the definition of this type. This shall be saved as [NBT](#formFile) tag string.
 <a name="entityProp"></a>{additional properties} | `<?>` | Amount and format of additional fields depending on the entity.
@@ -169,10 +168,11 @@ Following changes has been made compared to version 1:
 
 * Changed [Palette](#schematicPalette) from `object` with key as ids and value as index to a `list` with ids, so you can easily calculate an index and **access it directly without searching**.
 * Changed [BlockData](#schematicBlockData) from `varint[]` to `int[]` or `long[]` to support even bigger areas and because **NBT has no varint or varlong definition**.
-* Changed [Width](#schematicWidth), [Height](#schematicHeight), [Length](#schematicLength) from `unsigned short` to `unsigned integer` to support even **bigger areas**-
+* Changed [Width](#schematicWidth), [Height](#schematicHeight), [Length](#schematicLength) from `unsigned short` to `unsigned integer` to support even **bigger areas**.
 * Changed [PaletteMax](#schematicPaletteMax) from `integer` to `byte`, because **8 would be the maximum** possible value for Java implementations (64-bit long)
 * Added [Entity](#entityObject) field to **support entities**.
 * Changed [Date](#metadataDate) from miliseconds to seconds to the default **UNIX timestamp**, to cover a longer time range and because noone needs miliseconds.
+* Moved [ContentVersion](#schematicContentVersion) from entity & tile compounds up to the root compound. Because there is only one relevant version when exported, there is **no need for versioning each tile & entity**.
 
 ### Other changes
 
