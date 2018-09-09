@@ -24,7 +24,7 @@ All field names in the specification are **case sensitive**.
 
 #### <a name="formFile"></a>File
 
-The structure described by this specification is persisted to disk using the [Named Binary Tag](http://minecraft.gamepedia.com/NBT_format) (NBT) format (also see [here](https://wiki.vg/NBT)). Before writing to disk the NBT data must be compressed using the [GZip](https://www.gnu.org/software/gzip/) data compression algorithm. The highly recommended file extension for files using this specification is `.schem` (chosen so as to not conflict with the legacy `.schematic` format allowing easy distinction between the two).
+The structure described by this specification is persisted to disk using the [Named Binary Tag](http://minecraft.gamepedia.com/NBT_format) (NBT) format (also see [here](https://wiki.vg/NBT)). Before writing to disk the NBT data must be compressed using the [GZip](https://www.gnu.org/software/gzip/) data compression algorithm. The highly recommended file extension for files using this specification is `.schem` or `.spongeschem` (chosen so as to not conflict with the legacy `.schematic` format allowing easy distinction between the two).
 
 #### <a name="formId"></a>Identification string
 
@@ -65,21 +65,21 @@ Field Name | Type | Description
 <a name="metadataName"></a>Name | `NBT string` | **Optional.** The name of the schematic. This shall be saved as [NBT](#formFile) tag string.
 <a name="metadataAuthor"></a>Author | `NBT string` | **Optional.** The name of the author of the schematic. This shall be saved as [NBT](#formFile) tag string.
 <a name="metadataDate"></a>Date | `NBT long` | **Optional.** The date that this schematic was created on. This is specified as seconds since the Unix epoch. This shall be saved as [NBT](#formFile) tag long.
-<a name="metadataRequiredMods"></a>RequiredMods | `NBT list of NBT string` | **Optional.** An array of mod ids which have blocks which are referenced by this schematic's defined [Palette](#schematicPalette) or other contents of the schematic (e.g. [Tiles](#tileEntityObject) or [Entities](entityObject)). May be empty. This shall be saved as [NBT](#formFile) tag list of NBT tag string.
-<a name="metadataOptionalMods"></a>OptionalMods | `NBT list of NBT string` | **Optional.** An array of mod ids which are needed to fully provide all features saved within this schematic. May be empty. This shall be saved as [NBT](#formFile) tag list of NBT tag string.
+<a name="metadataRequiredMods"></a>RequiredMods | `NBT list` of `NBT string` | **Optional.** An array of mod ids which have blocks which are referenced by this schematic's defined [Palette](#schematicPalette) or other contents of the schematic (e.g. [Tiles](#tileEntityObject) or [Entities](entityObject)). May be empty. This shall be saved as [NBT](#formFile) tag list of NBT tag string.
+<a name="metadataOptionalMods"></a>OptionalMods | `NBT list` of `NBT string` | **Optional.** An array of mod ids which are needed to fully provide all features saved within this schematic. May be empty. This shall be saved as [NBT](#formFile) tag list of NBT tag string.
 
 ##### Metadata Object Example:
 
-```js
+```NBT
 {
-    "Name": "My Schematic",
-    "Author": "Author Name",
-    "Date": 1534701119,
-    "RequiredMods": [
+    Name: "My Schematic",
+    Author: "Author Name",
+    Date: 1534701119,
+    RequiredMods: [
         "a_mod",
         "another_mod"
     ],
-    "OptionalMods": [
+    OptionalMods: [
         "CraftBukkit"
     ]
 }
@@ -100,8 +100,8 @@ For example the air block has no properties so its representation would be just 
 
 ##### Palette Object Example
 
-```js
-"Palette" [
+```NBT
+Palette: [
     "minecraft:air",
     "minecraft:planks[variant=oak]",
     "a_mod:custom"
@@ -120,21 +120,22 @@ Field Pattern | Type | Description
 <a name="tileEntityPosX"></a>x | `NBT int` | **Required**. As specified by chunk format above, BUT this value must to be converted to relative coordinates of the area. Relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffset) applied).
 <a name="tileEntityPosY"></a>y | `NBT int` | **Required**. As specified by chunk format above, BUT this value must to be converted to relative coordinates of the area. Relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffset) applied).
 <a name="tileEntityPosZ"></a>z | `NBT int` | **Required**. As specified by chunk format above, BUT this value must to be converted to relative coordinates of the area. Relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffset) applied).
+<a name="tileEntityAdd"></a>{additions} | `<?>` | **Optional.** May be expanded by custom values needed for modifications. The corresponding Mod should at least be listed as optional within the [Metadata object](#metadataObject).
 
 ##### Tile Entity Object Example
 
 An example of possible storage of a sign. See the [Minecraft Chunk Format](http://minecraft.gamepedia.com/Chunk_format#Block_entity_format) for a complete listing of data used to store various types of tile entities present in vanilla minecraft. Mods may store additional data or have additional types of tile entities.
 
-```js
+```NBT
 {
-    "x": 0,
-    "y": 1,
-    "z": 2,
-    "id": "minecraft:sign",
-    "Text1": "foo",
-    "Text2": "",
-    "Text3": "bar",
-    "Text4": ""
+    x: 0,
+    y: 1,
+    z: 2,
+    id: "minecraft:sign",
+    Text1: "foo",
+    Text2: "",
+    Text3: "bar",
+    Text4: ""
 }
 ```
 
@@ -147,17 +148,16 @@ An object to specify all entitys which are within the area. Entities are used by
 Field Pattern | Type | Description
 ---|:---:|---
 <a name="entityProp"></a>{properties} | `<?>` | **Required**. Amount and format of fields depending on the entity, specified by Mojang. As listed within the [Minecraft Chunk Format](https://minecraft.gamepedia.com/Chunk_format#Entity_format).
-<a name="entityPos"></a>Pos | `NBT list of NBT double`[3] | **Required.** As specified by chunk format above, BUT this value must to be converted to relative coordinates of the area. Relative to the `[0.0, 0.0, 0.0]` position of the schematic (without the [offset](#schematicOffset) applied). Must contain exactly 3 double values. This shall be saved as [NBT](#formFile) tag list of [NBT](#formFile) tag double.
-<a name="entityProp"></a>{additional properties} | `<?>` | Amount and format of additional fields depending on the entity.
+<a name="entityPos"></a>Pos | `NBT list` of `NBT double`[3] | **Required.** As specified by chunk format above, BUT this value must to be converted to relative coordinates of the area. Relative to the `[0.0, 0.0, 0.0]` position of the schematic (without the [offset](#schematicOffset) applied). Must contain exactly 3 double values. This shall be saved as [NBT](#formFile) tag list of [NBT](#formFile) tag double.
 <a name="entityUUIDHigh"></a>UUIDMost | `NBT long` | **Required.** As specified by chunk format above, BUT a implementation must check if the UUID is already present and if so, replace this one by another.
 <a name="entityUUIDLow"></a>UUIDLeast | `NBT long` | **Required.** As specified by chunk format above, BUT a implementation must check if the UUID is already present and if so, replace this one by another.
-<a name="entityAdd"></a>{additions} | `<?>` | **Optional.** May be expanded by custom values needed for modifications (e.g. CraftBukkit adds `Bukkit.updateLevel`).
+<a name="entityAdd"></a>{additions} | `<?>` | **Optional.** May be expanded by custom values needed for modifications (e.g. CraftBukkit adds `Bukkit.updateLevel`). The corresponding Mod should at least be listed as optional within the [Metadata object](#metadataObject).
 
 ##### Entity Object Example
 
 An example of possible storage of a sign. See the [Minecraft Chunk Format](https://minecraft.gamepedia.com/Chunk_format#Entity_format) for a complete listing of data used to store various types of tile entities present in vanilla minecraft. Mods may store additional data or have additional types of entities.
 
-```js
+```NBT
 {
     AgeLocked: 0b,
     HurtByTimestamp: 0,
