@@ -42,16 +42,16 @@ Field Name | Type | Description
 ---|:---:|---
 <a name="schematicVersion"></a>Version | `NBT int` | **Required.** Specified the format version being used. It may be used to provide validation and auto-conversion from older versions. The current version is `2`. This shall be saved as [NBT](#formFile) tag int.
 <a name="schematicContentVersion"></a>ContentVersion | `NBT int` | **Required.** A version identifier for the contents. Representing the minecraft version, when serialized. Used for providing backwards compatibility. [Values are specified by Mojang](https://minecraft-de.gamepedia.com/Versionen#Version-IDs). Mojangs data converter for older versions will need this value for proper conversion. This shall be saved as [NBT](#formFile) tag int.
-<a name="schematicMetadata"></a>Metadata | [Metadata Object](#metadataObject) as `NBT compound` | **Optional** Provides metadata about the schematic. This shall be saved as [NBT](#formFile) tag compound.
+<a name="schematicMetadata"></a>Metadata | [Metadata Object](#metadataObject) as `NBT compound` | **Optional.** Provides metadata about the schematic. This shall be saved as [NBT](#formFile) tag compound.
 <a name="schematicWidth"></a>Width | `NBT int` | **Required.** Specifies the width (the amount of blocks along the X-axis) of the schematic, must be interpreted as unsigned. This shall be saved as [NBT](#formFile) tag int.
 <a name="schematicHeight"></a>Height | `NBT int` | **Required.** Specifies the height (the amount of blocks along the Y-axis) of the schematic, must be interpreted as unsigned. This shall be saved as [NBT](#formFile) tag int.
 <a name="schematicLength"></a>Length | `NBT int` | **Required.** Specifies the length (the amount of blocks along the Z-axis) of the schematic, must be interpreted as unsigned. This shall be saved as [NBT](#formFile) tag int.
-<a name="schematicOffset"></a>Offset | `NBT int array`[3] | **Optional** Specifies the relative offset of the schematic. This value is relative to the most minimal point in the schematics area. If present, this offset will be added to all blocks, tiles and entities when pasting it into the world (may be negative). This shall be saved as [NBT](#formFile) tag int array.
-<a name="schematicPaletteMax"></a>PaletteMax | `NBT byte` | **Required** Specifies the size of the block palette index in number of bytes needed for the maximum palette index. Implementations must use this to determine, which index format will be needed. The palette index may fit within a datatype smaller than a 32-bit integer or even a longer datatype like 64-bit integer. This shall be saved as [NBT](#formFile) tag byte.
-<a name="schematicPalette"></a>Palette | `NBT list` of [Palette Object](#paletteObject) | **Required** Specifies the block palette. This is a mapping of block states to indices which are local to this schematic. The array element indices are used to reference the block states from within the [BlockData array](#schematicBlockData). The maximum index cannot be greater than [`2^(PaletteMax * 8) - 1`](#schematicPaletteMax).  This shall be saved as [NBT](#formFile) tag list of [NBT](#formFile) tag string.
+<a name="schematicOffset"></a>Offset | `NBT int array`[3] | **Optional.** Specifies the relative offset of the schematic. This value is relative to the most minimal point in the schematics area. If present, this offset shall be added to all blocks, tiles and entities when pasting it into the world (may be negative). This shall be saved as [NBT](#formFile) tag int array.
+<a name="schematicPaletteMax"></a>PaletteMax | `NBT byte` | **Required.** Specifies the size of the block palette index in number of bytes needed for the maximum palette index. Implementations must use this to determine, which index format will be needed. The palette index may fit within a datatype smaller than a 32-bit integer or even a longer datatype like 64-bit integer. This shall be saved as [NBT](#formFile) tag byte.
+<a name="schematicPalette"></a>Palette | `NBT list` of [Palette Object](#paletteObject) as `NBT compound` | **Required.** Specifies the block palette. This is a mapping of block states to indices which are local to this schematic. The array element indices are used to reference the block states from within the [BlockData array](#schematicBlockData). The maximum index cannot be greater than [`2^(PaletteMax * 8) - 1`](#schematicPaletteMax).  This shall be saved as [NBT](#formFile) tag list of [NBT](#formFile) tag string.
 <a name="schematicBlockData"></a>BlockData | `nbt int array` or `nbt long array` | **Required.** Specifies the main storage array which contains `Width * Height * Length` entries. Each entry is specified as a `int` or `long`, depending on the given [PaletteMax](#schematicPaletteMax) (1 to 4 bytes = int; 5 to 8 bytes = long). This index refers to the array element index within the [Palette](#schematicPalette). The entries are indexed by `x + z * Width + y * Width * Length`. This shall be saved as [NBT](#formFile) tag int array or [NBT](#formFile) tag long array.
-<a name="schematicTileEntities"></a>TileEntities | `NBT list` of [TileEntity Object](#tileEntityObject) | **OPTIONAL** Specifies additional data for blocks which require extra data. If no additional data is provided for a block which normally requires extra data then it is assumed that the TileEntity for the block is initialized to its default state. This shall be saved as [NBT](#formFile) tag list of [NBT](#formFile) tag compound.
-<a name="schematicEntities"></a>Entities | `NBT list` of [Entity Object](#entityObject) | **OPTIONAL** Specifies all entities, within the area of this schematic. This shall be saved as [NBT](#formFile) tag list of [NBT](#formFile) tag compound.
+<a name="schematicTileEntities"></a>TileEntities | `NBT list` of [TileEntity Object](#tileEntityObject) as `NBT compound` | **Optional.** Specifies additional data for blocks which require extra data. If no additional data is provided for a block which normally requires extra data then it is assumed that the TileEntity for the block is initialized to its default state. This shall be saved as [NBT](#formFile) tag list of [NBT](#formFile) tag compound.
+<a name="schematicEntities"></a>Entities | `NBT list` of [Entity Object](#entityObject) as `NBT compound` | **Optional.** Specifies all entities, within the area of this schematic. This shall be saved as [NBT](#formFile) tag list of [NBT](#formFile) tag compound.
 
 
 #### <a name="metadataObject"></a>Metadata Object
@@ -62,10 +62,11 @@ An object which provides optional additional meta information about the schemati
 
 Field Name | Type | Description
 ---|:---:|---
-<a name="metadataName"></a>Name | `string` | **OPTIONAL** The name of the schematic. This shall be saved as [NBT](#formFile) tag string.
-<a name="metadataAuthor"></a>Author | `string` | **OPTIONAL** The name of the author of the schematic. This shall be saved as [NBT](#formFile) tag string.
-<a name="metadataDate"></a>Date | `long` | **OPTIONAL** The date that this schematic was created on. This is specified as seconds since the Unix epoch. This shall be saved as [NBT](#formFile) tag long.
-<a name="metadataRequiredMods"></a>RequiredMods | `string`[] | **OPTIONAL** An array of mod ids which have blocks which are referenced by this schematic's defined [Palette](#schematicPalette). May be empty. This shall be saved as [NBT](#formFile) tag list of NBT tag string.
+<a name="metadataName"></a>Name | `NBT string` | **Optional.** The name of the schematic. This shall be saved as [NBT](#formFile) tag string.
+<a name="metadataAuthor"></a>Author | `NBT string` | **Optional.** The name of the author of the schematic. This shall be saved as [NBT](#formFile) tag string.
+<a name="metadataDate"></a>Date | `NBT long` | **Optional.** The date that this schematic was created on. This is specified as seconds since the Unix epoch. This shall be saved as [NBT](#formFile) tag long.
+<a name="metadataRequiredMods"></a>RequiredMods | `NBT list of NBT string` | **Optional.** An array of mod ids which have blocks which are referenced by this schematic's defined [Palette](#schematicPalette) or other contents of the schematic (e.g. [Tiles](#tileEntityObject) or [Entities](entityObject)). May be empty. This shall be saved as [NBT](#formFile) tag list of NBT tag string.
+<a name="metadataOptionalMods"></a>OptionalMods | `NBT list of NBT string` | **Optional.** An array of mod ids which are needed to fully provide all features saved within this schematic. May be empty. This shall be saved as [NBT](#formFile) tag list of NBT tag string.
 
 ##### Metadata Object Example:
 
@@ -77,6 +78,9 @@ Field Name | Type | Description
     "RequiredMods": [
         "a_mod",
         "another_mod"
+    ],
+    "OptionalMods": [
+        "CraftBukkit"
     ]
 }
 ```
@@ -112,9 +116,10 @@ An object to specify a tile entity which is within the area. Tile entities are u
 
 Field Pattern | Type | Description
 ---|:---:|---
-<a name="tileEntityPos"></a>Pos | `unsigned integer[3]` | **Required.** The position of the tile entity relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffset) applied). Must contain exactly 3 integer values. This shall be saved as [NBT](#formFile) tag int array.
-<a name="tileEntityId"></a>Id | `string` | **Required.** The id of the tile entity type defined by this tile entity object, specified as a resource location. This should be used to identify which fields should be required for the definition of this type. This shall be saved as [NBT](#formFile) tag string.
-<a name="tileEntityProp"></a>{additional properties} | `<?>` | Amount and format of additional fields depending on the tile entity.
+<a name="tileEntityProp"></a>{properties} | `<?>` | **Required**. Amount and format of fields depending on the tile entity, specified by Mojang. As listed within the [Minecraft Chunk Format](http://minecraft.gamepedia.com/Chunk_format#Block_entity_format).
+<a name="tileEntityPosX"></a>x | `NBT int` | **Required**. As specified by chunk format above, BUT this value must to be converted to relative coordinates of the area. Relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffset) applied).
+<a name="tileEntityPosY"></a>y | `NBT int` | **Required**. As specified by chunk format above, BUT this value must to be converted to relative coordinates of the area. Relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffset) applied).
+<a name="tileEntityPosZ"></a>z | `NBT int` | **Required**. As specified by chunk format above, BUT this value must to be converted to relative coordinates of the area. Relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffset) applied).
 
 ##### Tile Entity Object Example
 
@@ -122,9 +127,10 @@ An example of possible storage of a sign. See the [Minecraft Chunk Format](http:
 
 ```js
 {
-    "ContentVersion": 0,
-    "Pos": [0, 1, 0],
-    "Id": "minecraft:Sign",
+    "x": 0,
+    "y": 1,
+    "z": 2,
+    "id": "minecraft:sign",
     "Text1": "foo",
     "Text2": "",
     "Text3": "bar",
@@ -140,9 +146,12 @@ An object to specify all entitys which are within the area. Entities are used by
 
 Field Pattern | Type | Description
 ---|:---:|---
-<a name="entityPos"></a>Pos | `double[3]` | **Required.** The position of the entity relative to the `[0.0, 0.0, 0.0]` position of the schematic (without the [offset](#schematicOffset) applied). Must contain exactly 3 double values. This shall be saved as [NBT](#formFile) tag list of [NBT](#formFile) tag double.
-<a name="entityId"></a>Id | `string` | **Required.** The id of the entity type, specified as a resource location. This should be used to identify which fields should be required for the definition of this type. This shall be saved as [NBT](#formFile) tag string.
+<a name="entityProp"></a>{properties} | `<?>` | **Required**. Amount and format of fields depending on the entity, specified by Mojang. As listed within the [Minecraft Chunk Format](https://minecraft.gamepedia.com/Chunk_format#Entity_format).
+<a name="entityPos"></a>Pos | `NBT list of NBT double`[3] | **Required.** As specified by chunk format above, BUT this value must to be converted to relative coordinates of the area. Relative to the `[0.0, 0.0, 0.0]` position of the schematic (without the [offset](#schematicOffset) applied). Must contain exactly 3 double values. This shall be saved as [NBT](#formFile) tag list of [NBT](#formFile) tag double.
 <a name="entityProp"></a>{additional properties} | `<?>` | Amount and format of additional fields depending on the entity.
+<a name="entityUUIDHigh"></a>UUIDMost | `NBT long` | **Required.** As specified by chunk format above, BUT a implementation must check if the UUID is already present and if so, replace this one by another.
+<a name="entityUUIDLow"></a>UUIDLeast | `NBT long` | **Required.** As specified by chunk format above, BUT a implementation must check if the UUID is already present and if so, replace this one by another.
+<a name="entityAdd"></a>{additions} | `<?>` | **Optional.** May be expanded by custom values needed for modifications (e.g. CraftBukkit adds `Bukkit.updateLevel`).
 
 ##### Entity Object Example
 
@@ -150,13 +159,54 @@ An example of possible storage of a sign. See the [Minecraft Chunk Format](https
 
 ```js
 {
-    "ContentVersion": 0,
-    "Pos": [0, 1, 0],
-    "Id": "minecraft:Sign",
-    "Text1": "foo",
-    "Text2": "",
-    "Text3": "bar",
-    "Text4": ""
+    AgeLocked: 0b,
+    HurtByTimestamp: 0,
+    Attributes: [
+        { Base: 10.0d, Name: "generic.maxHealth" },
+        { Base: 0.0d, Name: "generic.knockbackResistance" },
+        { Base: 0.20000000298023224d, Name: "generic.movementSpeed" },
+        { Base: 0.0d, Name: "generic.armor" },
+        { Base: 0.0d, Name: "generic.armorToughness" },
+        { Base: 16.0d, Modifiers: [
+            {
+                UUIDMost: 4449189467270498881L,
+                UUIDLeast: -8942318547875874041L,
+                Amount: -0.05492870821106577d,
+                Operation: 1,
+                Name: "Random spawn bonus"
+            }
+        ],
+        Name: "generic.followRange" }
+    ],
+    Invulnerable: 0b,
+    FallFlying: 0b,
+    ForcedAge: 0,
+    PortalCooldown: 0,
+    AbsorptionAmount: 0.0f,
+    FallDistance: 0.0f,
+    InLove: 0,
+    DeathTime: 0s,
+    HandDropChances: [ 0.085f, 0.085f ],
+    PersistenceRequired: 1b,
+    Spigot.ticksLived: 74919199,
+    Age: 0,
+    Motion: [ 0.0d, -0.0784000015258789d, 0.0d ],
+    Leashed: 0b,
+    UUIDLeast: -7755591127829794293L,
+    Health: 10.0f,
+    LeftHanded: 0b,
+    Air: 300s,
+    OnGround: 1b,
+    Dimension: 0,
+    Rotation: [ 194.99161f, 0.0f ],
+    HandItems: [ {}, {} ],
+    ArmorDropChances: [ 0.085f, 0.085f, 0.085f, 0.085f ],
+    UUIDMost: 7781923390897078472L,
+    Pos: [ 121.25787019796437d, 69.0d, 139.3946334861942d ],
+    Fire: -1s,
+    ArmorItems: [ {}, {}, {}, {} ],
+    CanPickUpLoot: 0b,
+    HurtTime: 0s,
 }
 ```
 
@@ -173,6 +223,8 @@ Following changes has been made compared to version 1:
 * Added [Entity](#entityObject) field to **support entities**.
 * Changed [Date](#metadataDate) from miliseconds to seconds to the default **UNIX timestamp**, to cover a longer time range and because noone needs miliseconds.
 * Moved [ContentVersion](#schematicContentVersion) from entity & tile compounds up to the root compound. Because there is only one relevant version when exported, there is **no need for versioning each tile & entity**.
+* Changed [Pos](#tileEntityPosX) of tiles to x, y, z. Because mojangs specified it like this, so there is **no more conversion necessary**.
+* Added [OptionalMods](#metadataOptionalMods) to Metadata. Because there often are only optional additional **features within tiles or entities, which are not necessarily needed**.
 
 ### Other changes
 
