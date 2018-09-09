@@ -216,9 +216,9 @@ Following changes has been made compared to version 1:
 
 ### Functional changes
 
-* Changed [Palette](#schematicPalette) from `object` with key as ids and value as index to a `list` with ids, so you can easily calculate an index and **access it directly without searching**.
+* Changed [Palette](#schematicPalette) from `object` with IDs as key and index as value to a `list` with IDs, so you can easily calculate an index and **access it directly without searching**.
 * Changed [BlockData](#schematicBlockData) from `varint[]` to `int[]` or `long[]` to support even bigger areas and because **NBT has no varint or varlong definition**.
-* Changed [Width](#schematicWidth), [Height](#schematicHeight), [Length](#schematicLength) from `unsigned short` to `unsigned integer` to support even **bigger areas**.
+* Changed [Width](#schematicWidth), [Height](#schematicHeight), [Length](#schematicLength) from `unsigned short` to `unsigned integer` to support even **bigger areas and noone cares about 3 more bytes**.
 * Changed [PaletteMax](#schematicPaletteMax) from `integer` to `byte`, because **8 would be the maximum** possible value for Java implementations (64-bit long)
 * Added [Entity](#entityObject) field to **support entities**.
 * Changed [Date](#metadataDate) from miliseconds to seconds to the default **UNIX timestamp**, to cover a longer time range and because noone needs miliseconds.
