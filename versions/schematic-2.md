@@ -65,7 +65,7 @@ Field Name | Type | Description
 <a name="metadataName"></a>Name | `NBT string` | **Optional.** The name of the schematic. This shall be saved as [NBT](#formFile) tag string.
 <a name="metadataAuthor"></a>Author | `NBT string` | **Optional.** The name of the author of the schematic. This shall be saved as [NBT](#formFile) tag string.
 <a name="metadataDate"></a>Date | `NBT long` | **Optional.** The date that this schematic was created on. This is specified as seconds since the Unix epoch. This shall be saved as [NBT](#formFile) tag long.
-<a name="metadataRequiredMods"></a>RequiredMods | `NBT list` of `NBT string` | **Optional.** An array of mod ids which have blocks which are referenced by this schematic's defined [Palette](#schematicPalette) or other contents of the schematic (e.g. [Tiles](#tileEntityObject) or [Entities](entityObject)). May be empty. This shall be saved as [NBT](#formFile) tag list of NBT tag string.
+<a name="metadataRequiredMods"></a>RequiredMods | `NBT list` of `NBT string` | **Optional.** An array of mod ids which have blocks which are referenced by this schematic's defined [Palette](#schematicPalette) or other contents of the schematic (e.g. [Tiles](#tileEntityObject) or [Entities](#entityObject)). May be empty. This shall be saved as [NBT](#formFile) tag list of NBT tag string.
 <a name="metadataOptionalMods"></a>OptionalMods | `NBT list` of `NBT string` | **Optional.** An array of mod ids which are needed to fully provide all features saved within this schematic. May be empty. This shall be saved as [NBT](#formFile) tag list of NBT tag string.
 
 ##### Metadata Object Example:
