@@ -5,4 +5,4 @@ between different versions, platforms, and varyingly modded environments. This f
 
 ## Current Version - 2
 
-The current version of the Sponge Schematic Specification is 1 - and can be found [here](versions/schematic-2.md).
+The current version of the Sponge Schematic Specification is 2 - and can be found [here](versions/schematic-2.md).
