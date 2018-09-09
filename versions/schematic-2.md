@@ -14,7 +14,7 @@ This specification defines a format which describes an area of a [Minecraft](htt
 Version | Date | Notes
 ---|:---:|---
 1 | 2016-08-23 | Initial Version
-2 | 2018-08-19 | More features, easier handling, see [Changelog](#versionChange)
+2 | 2018-08-19 | More features, easier handling, see [Changelog](#changelog)
 
 ## Specification
 
@@ -210,7 +210,7 @@ An example of possible storage of a sign. See the [Minecraft Chunk Format](https
 }
 ```
 
-## <a href="versonChange"></a>Changelog
+## Changelog
 
 Following changes has been made compared to version 1:
 
