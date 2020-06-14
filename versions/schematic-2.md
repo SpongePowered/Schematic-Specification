@@ -81,7 +81,7 @@ This is the root object for the specification.
 Field Name | Type | Description
 ---|:---:|---
 <a name="schematicVersion"></a>Version | `integer` | **Required.** Specifies the format version being used. It may be used to provide validation and auto-conversion from older versions. The current version is `2`.
-<a name="schematicDataVersion"></a>Data Version | `integer` | **Required.** Specifies the data version of Minecraft that was used to create the schematic. This is to allow for block and entity data to be validated and auto-conversion from older versions. This is dependent on the Minecraft version, eg. Minecraft 1.12.2's data version is [1343](https://minecraft.gamepedia.com/1.12.2).
+<a name="schematicDataVersion"></a>DataVersion | `integer` | **Required.** Specifies the data version of Minecraft that was used to create the schematic. This is to allow for block and entity data to be validated and auto-conversion from older versions. This is dependent on the Minecraft version, eg. Minecraft 1.12.2's data version is [1343](https://minecraft.gamepedia.com/1.12.2).
 <a name="schematicMetadata"></a>Metadata | [Metadata Object](#metadataObject) | Provides optional metadata about the schematic.
 <a name="schematicWidth"></a>Width | `unsigned short` | **Required.** Specifies the width (the size of the area in the X-axis) of the schematic.
 <a name="schematicHeight"></a>Height | `unsigned short` | **Required.** Specifies the height (the size of the area in the Y-axis) of the schematic.
