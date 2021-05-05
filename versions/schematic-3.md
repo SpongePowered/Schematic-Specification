@@ -89,13 +89,11 @@ Field Name | Type | Description
 <a name="schematicHeight"></a>Height | `unsigned short` | **Required.** Specifies the height (the size of the area in the Y-axis) of the schematic.
 <a name="schematicLength"></a>Length | `unsigned short` | **Required.** Specifies the length (the size of the area in the Z-axis) of the schematic.
 <a name="schematicOffset"></a>Offset | `integer`[3] |  **Required.** Specifies the relative offset of the schematic. This value is relative to the most minimal point in the schematics area. The default value if not provided is `[0, 0, 0]`. This may be used when incorporating the area of blocks defined by this schematic to a larger area to place the blocks relative to a selected point.
-<a name="schematicPaletteMax"></a>PaletteMax | `integer` |  **Required.** Specifies the size of the block palette in number of bytes needed for the maximum palette index. Essentially, this is the `max index - 1`.
-<a name="schematicPalette"></a>Palette | [Palette Object](#paletteObject) |  **Required.** Specifies the block palette. This is a mapping of block states to indices which are local to this schematic. These indices are used to reference the block states from within the [BlockData array](#schematicBlockData). It is recommeneded for maximum data compression that your indices start at zero and skip no values. The maximum index cannot be greater than [`PaletteMax - 1`](#schematicPaletteMax).
+<a name="schematicPalette"></a>BlockPalette | [Palette Object](#paletteObject) |  **Required.** Specifies the block palette. This is a mapping of block states to indices which are local to this schematic. These indices are used to reference the block states from within the [BlockData array](#schematicBlockData). It is recommeneded for maximum data compression that your indices start at zero and skip no values.
 <a name="schematicBlockData"></a>BlockData | `varint[]` | **Required.** Specifies the main storage array which contains `Width * Height * Length` entries. Each entry is specified as a varint and refers to an index within the [Palette](#schematicPalette). The entries are indexed by `x + z * Width + y * Width * Length`.
 <a name="schematicBlockEntities"></a>BlockEntities | [BlockEntity Object](#blockEntityObject)[] | Specifies additional data for blocks which require extra data. If no additional data is provided for a block which normally requires extra data then it is assumed that the BlockEntity for the block is initialized to its default state.
 <a name="schematicEntities"></a>Entities | [Entity Object](#entityObject)[] | Specifies entities to be placed in the schematic. If no additional data is provided for an [entity type](#defEntityType) which normally requires extra data, then it is assumed that the Entity is initialized with all defaults.
-<a name="schematicBiomePaletteMax"></a>BiomePaletteMax | `integer` |  **Required if `BiomeData` is present** Specifies the size of the biome palette
-<a name="schematicBiomePalette"></a>BiomePalette | [Palette Object](#paletteObject) |  **Required if `BiomeData` is present** Specifies the biome palette. This is a mapping of [biomes](#defBiome) to indicies which are local to this schematic. These indices are used to reference the biomes from within the [Biome array](#schematicBiomeData). It is recommended for maximum data compression that your indices start at zero and skip no values. The maximum index cannot be greater than [`BiomePaletteMax - 1`](#schematicBiomePaletteMax). While not required, it is highly recommended to include a palette in order to tightly pack the biome id's included in the data array.
+<a name="schematicBiomePalette"></a>BiomePalette | [Palette Object](#paletteObject) |  **Required if `BiomeData` is present** Specifies the biome palette. This is a mapping of [biomes](#defBiome) to indicies which are local to this schematic. These indices are used to reference the biomes from within the [Biome array](#schematicBiomeData). It is recommended for maximum data compression that your indices start at zero and skip no values.
 <a name="schematicBiomeData"></a>BiomeData | `varint[]` | Specifies the main storage array which contains `Width * Height * Length` entries for `Biome`s at positions. Each entry is specified as a varint and refers to an index within [BiomePalette](#schematicBiomePalette). The entries are indexed by `x + z * Width + y * Width * Length`.
 #### <a name="metadataObject"></a> Metadata Object
 
@@ -112,7 +110,7 @@ Field Name | Type | Description
 
 ##### Metadata Object Example:
 
-```js
+```json
 {
     "Name": "My Schematic",
     "Author": "Author Name",
@@ -125,7 +123,7 @@ Field Name | Type | Description
 
 #### <a name="paletteObject"></a>Palette Object
 
-An object which holds a mapping of a block state id to an index. The indices are recommended to start at `0` and may be no more than [`PaletteMax - 1`](#schematicPaletteMax). If the palette is not specified then the global mapping of ids is used instead. This is not recommended as it both expands the size of your blockdata and removes cross server and cross version compatibility for modded blocks which may change ids due to a variety of reasons.
+An object which holds a mapping of a resourced id to an index.
 
 #### Block State Ids
 
@@ -141,11 +139,13 @@ Field Pattern | Type | Description
 
 ##### Palette Object Example
 
-```js
-"Palette" {
-    "minecraft:air": 0,
-    "minecraft:planks[variant=oak]": 1,
-    "a_mod:custom": 2
+```json
+{
+    "BlockPalette": {
+        "minecraft:air": 0,
+        "minecraft:planks[variant=oak]": 1,
+        "a_mod:custom": 2
+    }
 }
 ```
 
@@ -165,7 +165,7 @@ Field Pattern | Type | Description
 
 An example of possible storage of a sign. See the [Minecraft Chunk Format](http://minecraft.gamepedia.com/Chunk_format#Block_entity_format) for a complete listing of data used to store various types of block entities present in vanilla minecraft. Mods may store additional data or have additional types of block entities.
 
-```js
+```json
 {
     "Pos": [0, 1, 0],
     "Id": "minecraft:Sign",
@@ -192,10 +192,10 @@ An example of possible storage of a creeper. See the [Minecraft Chunk Format](ht
 
 ```json
 {
-    "Pos": [15.0043293D, 68.000321D, 40.452D],
+    "Pos": [15.0043293, 68.000321, 40.452],
     "Id": "minecraft:creeper",
-    "Motion": [0.00203D, 0.00203D, 1.000D], 
-    "Rotation": [189.30f, 45f],
+    "Motion": [0.00203, 0.00203, 1.000], 
+    "Rotation": [189.30, 45],
     "Fire": -20,
     "NoGravity": 0,
     "CustomName": "Sheep",
