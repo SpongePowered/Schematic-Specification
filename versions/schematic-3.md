@@ -88,13 +88,10 @@ Field Name | Type | Description
 <a name="schematicWidth"></a>Width | `unsigned short` | **Required.** Specifies the width (the size of the area in the X-axis) of the schematic.
 <a name="schematicHeight"></a>Height | `unsigned short` | **Required.** Specifies the height (the size of the area in the Y-axis) of the schematic.
 <a name="schematicLength"></a>Length | `unsigned short` | **Required.** Specifies the length (the size of the area in the Z-axis) of the schematic.
-<a name="schematicOffset"></a>Offset | `integer[3]` |  **Required.** Specifies the relative offset of the schematic. This value is relative to the most minimal point in the schematics area. The default value if not provided is `[0, 0, 0]`. This may be used when incorporating the area of blocks defined by this schematic to a larger area to place the blocks relative to a selected point.
-<a name="schematicPalette"></a>BlockPalette | [Palette Object](#paletteObject) |  **Required.** Specifies the block palette. This is a mapping of block states to indices which are local to this schematic. These indices are used to reference the block states from within the [BlockData array](#schematicBlockData). It is recommeneded for maximum data compression that your indices start at zero and skip no values.
-<a name="schematicBlockData"></a>BlockData | `varint[]` | **Required.** Specifies the main storage array which contains `Width * Height * Length` entries. Each entry is specified as a varint and refers to an index within the [Palette](#schematicPalette). The entries are indexed by `x + z * Width + y * Width * Length`.
-<a name="schematicBlockEntities"></a>BlockEntities | [BlockEntity Object](#blockEntityObject)[] | Specifies additional data for blocks which require extra data. If no additional data is provided for a block which normally requires extra data then it is assumed that the BlockEntity for the block is initialized to its default state.
+<a name="schematicOffset"></a>Offset | `integer[3]` | Specifies the relative offset of the schematic from the paster. When pasting, if there is a reasonable location to use as a base position, implementations SHOULD offset the location of the paste by this vector. The default value if not provided is `[0, 0, 0]`. Example: If a player is pasting from `1, 2, 3`, and the offset is `4, 5, 6`, then the first block should be placed at `5, 7, 9`
+<a name="schematicLength"></a>Blocks | [Block Container](#blockContainer) | Specifies Block related data such as placing `BlockState`s and `BlockEntity` instances.
+<a name="schematicLength"></a>Biomes | [Biome Container](#biomeContainer) | Specifies Biome related data.
 <a name="schematicEntities"></a>Entities | [Entity Object](#entityObject)[] | Specifies entities to be placed in the schematic. If no additional data is provided for an [entity type](#defEntityType) which normally requires extra data, then it is assumed that the Entity is initialized with all defaults.
-<a name="schematicBiomePalette"></a>BiomePalette | [Palette Object](#paletteObject) |  **Required if `BiomeData` is present** Specifies the biome palette. This is a mapping of [biomes](#defBiome) to indicies which are local to this schematic. These indices are used to reference the biomes from within the [Biome array](#schematicBiomeData). It is recommended for maximum data compression that your indices start at zero and skip no values.
-<a name="schematicBiomeData"></a>BiomeData | `varint[]` | Specifies the main storage array which contains `Width * Height * Length` entries for `Biome`s at positions. Each entry is specified as a varint and refers to an index within [BiomePalette](#schematicBiomePalette). The entries are indexed by `x + z * Width + y * Width * Length`.
 #### <a name="metadataObject"></a> Metadata Object
 
 An object which provides optional additional meta information about the schematic. The fields outlined here are guidelines to assist with standardization but it is recommended that any program reading and writing schematics persist all fields found within this object.
@@ -125,6 +122,39 @@ Field Name | Type | Description
 
 An object which holds a mapping of a resourced id to an index.
 
+##### Palette Object Example
+
+```json
+{
+    "minecraft:air": 0,
+    "minecraft:planks[variant=oak]": 1,
+    "a_mod:custom": 2
+}
+```
+
+#### <a name="blockContainer"></a> Block Container 
+
+An object which provides block based data and has particular requirements alone. Not all schematics need to consist of blocks.
+
+##### Fields
+
+Field Name | Type | Description
+---|:---:|---
+<a name="schematicPalette"></a>Palette | [Palette Object](#paletteObject) |  **Required** Specifies the palette. This is a mapping of block states to indices which are local to this schematic. These indices are used to reference the block states from within the [Data](#schematicBlockData) array. It is recommended for maximum data compression that your indices start at zero and skip no values.
+<a name="schematicBlockData"></a>Data | `varint[]` | **Required** Specifies the main storage array which contains `Width * Height * Length` entries. Each entry is specified as a varint and refers to an index within the [Palette](#schematicPalette). The entries are indexed by `x + z * Width + y * Width * Length`.
+<a name="schematicBlockEntities"></a>BlockEntities | [BlockEntity Object](#blockEntityObject)[] | Specifies additional data for blocks which require extra data. If no additional data is provided for a block which normally requires extra data then it is assumed that the BlockEntity for the block is initialized to its default state.
+
+#### <a name="biomeContainer"></a> Biome Container 
+
+An object which provides biome based data and has particular requirements alone. Not all schematics need to consist of biomes.
+
+##### Fields
+
+Field Name | Type | Description
+---|:---:|---
+<a name="schematicBiomePalette"></a>Palette | [Palette Object](#paletteObject) | **Required** Specifies the palette. This is a mapping of [biomes](#defBiome) to indices which are local to this schematic. These indices are used to reference the biomes from within the [Data](#schematicBiomeData) array. It is recommended for maximum data compression that your indices start at zero and skip no values.
+<a name="schematicBiomeData"></a>Data | `varint[]` | **Required** Specifies the main storage array which contains `Width * Height * Length` entries for `Biome`s at positions. Each entry is specified as a varint and refers to an index within the [Palette](#schematicBiomePalette). The entries are indexed by `x + z * Width + y * Width * Length`.
+
 #### Block State Ids
 
 The format of the Block State identifier is the id of the block type and a set of comma-separated property `key=value` pairs surrounded by square brackets. If the block has no properties then they can be excluded. The block type id is specified as a [Resource Location](#defResourceLocation).
@@ -136,18 +166,6 @@ For example the air block has no properties so its id representation would be ju
 Field Pattern | Type | Description
 ---|:---:|---
 <a name="paletteEntry"></a>{blockstate} | `integer` | A single entry mapping a blockstate to an index.
-
-##### Palette Object Example
-
-```json
-{
-    "BlockPalette": {
-        "minecraft:air": 0,
-        "minecraft:planks[variant=oak]": 1,
-        "a_mod:custom": 2
-    }
-}
-```
 
 #### <a name="blockEntityObject"></a>BlockEntity Object
 
