@@ -1,6 +1,6 @@
 # Sponge Schematic Specification
 
-#### Version 2
+#### Version 3
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](http://www.ietf.org/rfc/rfc2119.txt).
 
@@ -14,6 +14,7 @@ Version | Date | Notes
 --- | --- | ---
 1 | 2016-08-23 | Initial Version
 2 | 2019-05-08 | Entity and Biome support and DataVersion additions
+3 | 2021-05-04 | 3D Biome support
 
 
 ## Definitions
@@ -27,7 +28,7 @@ Resources identified by a Resource Location have an identifier string which is m
 ##### <a name="defBlockState"></a>Block State
 A Block State is an instance of a block type with a set of extra data used to further define the material or properties. The additional data varies by block type and a complete listing of vanilla types is available [here](http://minecraft.gamepedia.com/Block_states). Mods can add additional block types and properties. A state is always referencable by a [resource location](#defResourceLocation).
 
-##### <a name="defBlockEntity"></a>`BlockEntity`
+##### <a name="defBlockEntity"></a>BlockEntity
 A special Entity that resides at a position with a correlated [blockstate](#defBlockState). Specifically, these are instances that can have complex data contained within them and may perform various operations in the world and as a result, their data is stored separately and otherwise too complex to store as a [`BlockState`](#defBlockState). Examples of these include chests, furnaces, beacons, etc. where their data is specific to each position they may exist. More information on these can be read on the [minecraft wiki](https://minecraft.gamepedia.com/Block_entity).
 
 ##### <a name="defEntityType"></a>Entity Type
@@ -56,7 +57,8 @@ Specification Data Type | NBT Equivalent | Format Stored to target NBT Equivalen
 `varint[]` | `NBT Byte Array` | Each `integer` is bitpacked into a single `byte` with [varint](https://en.wikipedia.org/wiki/Variable-length_code) encoding. The first byte determines the length of the integer with a maximum length of 5 (for a 32 bit number), and depending on the length, each proceeding byte is or'ed and current value bit shifted by the length multiplied by `7`. Examples can be found with Sponge's implementation for [retreving data](https://github.com/SpongePowered/SpongeCommon/blob/aa2c8c53b4f9f40297e6a4ee281bee4f4ce7707b/src/main/java/org/spongepowered/common/data/persistence/SchematicTranslator.java#L147-L175) and [storing data](https://github.com/SpongePowered/SpongeCommon/blob/aa2c8c53b4f9f40297e6a4ee281bee4f4ce7707b/src/main/java/org/spongepowered/common/data/persistence/SchematicTranslator.java#L230-L251).
 `float[]` | `NBT List of NBT Float` | Each `float` is stored as an `NBT Float` in an indexed `NBT List`
 `double[]` | `NBT List of NBT Double` | Each `double` is stored as an `NBT Double` in an indexed `NBT List`
-`String` | `NBT String` | No conversion
+`string` | `NBT String` | No conversion
+`string[]` | `NBT List of NBT String` | No conversion
 `Object` | `NBT Compound` | No conversion, each object should serialize to supported types within a compound
 `Object[]` | `NBT List of NBT Compound` | No conversion, each `Object` is stored in an `NBT List` of `NBT Compound`s as indexed according to the `Object[]`.
 `extra` | `NBT Compound` | No conversion. Since extra data is stored within the same compound as the remaining data, there is no conversion.
@@ -80,21 +82,21 @@ This is the root object for the specification.
 
 Field Name | Type | Description
 ---|:---:|---
-<a name="schematicVersion"></a>Version | `integer` | **Required.** Specifies the format version being used. It may be used to provide validation and auto-conversion from older versions. The current version is `2`.
+<a name="schematicVersion"></a>Version | `integer` | **Required.** Specifies the format version being used. It may be used to provide validation and auto-conversion from older versions. The current version is `3`.
 <a name="schematicDataVersion"></a>DataVersion | `integer` | **Required.** Specifies the data version of Minecraft that was used to create the schematic. This is to allow for block and entity data to be validated and auto-conversion from older versions. This is dependent on the Minecraft version, eg. Minecraft 1.12.2's data version is [1343](https://minecraft.gamepedia.com/1.12.2).
 <a name="schematicMetadata"></a>Metadata | [Metadata Object](#metadataObject) | Provides optional metadata about the schematic.
 <a name="schematicWidth"></a>Width | `unsigned short` | **Required.** Specifies the width (the size of the area in the X-axis) of the schematic.
 <a name="schematicHeight"></a>Height | `unsigned short` | **Required.** Specifies the height (the size of the area in the Y-axis) of the schematic.
 <a name="schematicLength"></a>Length | `unsigned short` | **Required.** Specifies the length (the size of the area in the Z-axis) of the schematic.
-<a name="schematicOffset"></a>Offset | `integer`[3] | Specifies the relative offset of the schematic. This value is relative to the most minimal point in the schematics area. The default value if not provided is `[0, 0, 0]`. This may be used when incorporating the area of blocks defined by this schematic to a larger area to place the blocks relative to a selected point.
-<a name="schematicPaletteMax"></a>PaletteMax | `integer` | Specifies the size of the block palette in number of bytes needed for the maximum palette index. Essentially, this is the `max index - 1`.
-<a name="schematicPalette"></a>Palette | [Palette Object](#paletteObject) | Specifies the block palette. This is a mapping of block states to indices which are local to this schematic. These indices are used to reference the block states from within the [BlockData array](#schematicBlockData). It is recommeneded for maximum data compression that your indices start at zero and skip no values. The maximum index cannot be greater than [`PaletteMax - 1`](#schematicPaletteMax). While not required it is **highly** recommended that you include a palette in order to tightly pack the block ids included in the data array.
+<a name="schematicOffset"></a>Offset | `integer`[3] |  **Required.** Specifies the relative offset of the schematic. This value is relative to the most minimal point in the schematics area. The default value if not provided is `[0, 0, 0]`. This may be used when incorporating the area of blocks defined by this schematic to a larger area to place the blocks relative to a selected point.
+<a name="schematicPaletteMax"></a>PaletteMax | `integer` |  **Required.** Specifies the size of the block palette in number of bytes needed for the maximum palette index. Essentially, this is the `max index - 1`.
+<a name="schematicPalette"></a>Palette | [Palette Object](#paletteObject) |  **Required.** Specifies the block palette. This is a mapping of block states to indices which are local to this schematic. These indices are used to reference the block states from within the [BlockData array](#schematicBlockData). It is recommeneded for maximum data compression that your indices start at zero and skip no values. The maximum index cannot be greater than [`PaletteMax - 1`](#schematicPaletteMax).
 <a name="schematicBlockData"></a>BlockData | `varint[]` | **Required.** Specifies the main storage array which contains `Width * Height * Length` entries. Each entry is specified as a varint and refers to an index within the [Palette](#schematicPalette). The entries are indexed by `x + z * Width + y * Width * Length`.
 <a name="schematicBlockEntities"></a>BlockEntities | [BlockEntity Object](#blockEntityObject)[] | Specifies additional data for blocks which require extra data. If no additional data is provided for a block which normally requires extra data then it is assumed that the BlockEntity for the block is initialized to its default state.
 <a name="schematicEntities"></a>Entities | [Entity Object](#entityObject)[] | Specifies entities to be placed in the schematic. If no additional data is provided for an [entity type](#defEntityType) which normally requires extra data, then it is assumed that the Entity is initialized with all defaults.
-<a name="schematicBiomePaletteMax"></a>BiomePaletteMax | `integer` | Specifies the size of the biome palette
-<a name="schematicBiomePalette"></a>BiomePalette | [Palette Object](#paletteObject) | Specifies the biome palette. This is a mapping of [biomes](#defBiome) to indicies which are local to this schematic. These indices are used to reference the biomes from within the [Biome array](#schematicBiomeData). It is recommended for maximum data compression that your indices start at zero and skip no values. The maximum index cannot be greater than [`BiomePaletteMax - 1`](#schematicBiomePaletteMax). While not required, it is highly recommended to include a palette in order to tightly pack the biome id's included in the data array.
-<a name="schematicBiomeData"></a>BiomeData | `varint[]` | Specifies the main storage array which contains `Width * Length` entries for `Biome`s at positions. Each entriy is specified as a varint and refers to an index within [BiomePalette](#schematicBiomePalette). The entries are indexed by `x + z * Width`. Biomes occupy the full vertical column in regions.
+<a name="schematicBiomePaletteMax"></a>BiomePaletteMax | `integer` |  **Required if `BiomeData` is present** Specifies the size of the biome palette
+<a name="schematicBiomePalette"></a>BiomePalette | [Palette Object](#paletteObject) |  **Required if `BiomeData` is present** Specifies the biome palette. This is a mapping of [biomes](#defBiome) to indicies which are local to this schematic. These indices are used to reference the biomes from within the [Biome array](#schematicBiomeData). It is recommended for maximum data compression that your indices start at zero and skip no values. The maximum index cannot be greater than [`BiomePaletteMax - 1`](#schematicBiomePaletteMax). While not required, it is highly recommended to include a palette in order to tightly pack the biome id's included in the data array.
+<a name="schematicBiomeData"></a>BiomeData | `varint[]` | Specifies the main storage array which contains `Width * Height * Length` entries for `Biome`s at positions. Each entry is specified as a varint and refers to an index within [BiomePalette](#schematicBiomePalette). The entries are indexed by `x + z * Width + y * Width * Length`.
 #### <a name="metadataObject"></a> Metadata Object
 
 An object which provides optional additional meta information about the schematic. The fields outlined here are guidelines to assist with standardization but it is recommended that any program reading and writing schematics persist all fields found within this object.

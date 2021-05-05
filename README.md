@@ -7,13 +7,14 @@ supports all types of modded blocks and block states as well as serializing Enti
 The format specification is NOT intended to represent schematics as objects for use in consumer applications, it is a specification for the *storage* of a schematic. As such, many object types are
 specified to be as optimized as possible when used in storage.
 
-## Current Version - 2
+## Current Version - 3
 
-The current version of the Sponge Schematic Specification is 2 - and can be found [here](versions/schematic-2.md).
+The current version of the Sponge Schematic Specification is 3 - and can be found [here](versions/schematic-3.md).
 
 ### Changelog
 
 Version | Date | Changes
 ---|---|---
+3 | 2021-05-04 | - Change support for 3D Biomes <br> - Clarify some wording on `varint` support
 2 | 2019-05-08 | - Add Entities <br> - Add Biomes <br> - Add DataVersion per Minecraft versions <br> - Change `TileEntities` to `BlockEntities` for BlockEntity objects. <br> - Remove `ContentVersion` from various objects
 1 | 2016-08-23 | Initial Version
