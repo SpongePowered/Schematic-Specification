@@ -14,7 +14,7 @@ Version | Date | Notes
 --- | --- | ---
 1 | 2016-08-23 | Initial Version
 2 | 2019-05-08 | Entity and Biome support and DataVersion additions
-3 | 2021-05-04 | 3D Biome support
+3 | 2021-05-04 | 3D Biome support <br> Rename Palette to BlockPalette <br> Wordsmithing varint and palette usages
 
 
 ## Definitions
@@ -52,7 +52,7 @@ Specification Data Type | NBT Equivalent | Format Stored to target NBT Equivalen
 `long` | `NBT Long` | No conversion
 `float` | `NBT Float` | No conversion
 `double` | `NBT Double` | No conversion
-`unsigned short` | `NBT Short` | A full 16 bit signed short where the sign is ignored and value directly converted. Stored as NBT Short and absolute valued (values being from 0 -> 2^16 -1)
+`unsigned short` | `NBT Short` | Uses the 16 bits of the signed `NBT Short` to store an unsigned short. The value can be extracted to an integer in Java by using `value & 0xFFFF`.
 `integer[]` | `NBT Int Array` | No conversion
 `varint[]` | `NBT Byte Array` | Each `integer` is bitpacked with [varint](https://wiki.vg/VarInt_And_VarLong) encoding. A Examples can be found with Sponge's implementation for [retreving data](https://github.com/SpongePowered/SpongeCommon/blob/aa2c8c53b4f9f40297e6a4ee281bee4f4ce7707b/src/main/java/org/spongepowered/common/data/persistence/SchematicTranslator.java#L147-L175) and [storing data](https://github.com/SpongePowered/SpongeCommon/blob/aa2c8c53b4f9f40297e6a4ee281bee4f4ce7707b/src/main/java/org/spongepowered/common/data/persistence/SchematicTranslator.java#L230-L251).
 `float[]` | `NBT List of NBT Float` | Each `float` is stored as an `NBT Float` in an indexed `NBT List`
@@ -83,12 +83,12 @@ This is the root object for the specification.
 Field Name | Type | Description
 ---|:---:|---
 <a name="schematicVersion"></a>Version | `integer` | **Required.** Specifies the format version being used. It may be used to provide validation and auto-conversion from older versions. The current version is `3`.
-<a name="schematicDataVersion"></a>DataVersion | `integer` | **Required.** Specifies the data version of Minecraft that was used to create the schematic. This is to allow for block and entity data to be validated and auto-conversion from older versions. This is dependent on the Minecraft version, eg. Minecraft 1.12.2's data version is [1343](https://minecraft.gamepedia.com/1.12.2).
+<a name="schematicDataVersion"></a>DataVersion | `integer` | **Required.** Specifies the data version of Minecraft that was used to create the schematic. This is to allow for block and entity data to be validated and auto-converted from older versions. This is dependent on the Minecraft version, eg. Minecraft 1.12.2's data version is [1343](https://minecraft.gamepedia.com/1.12.2).
 <a name="schematicMetadata"></a>Metadata | [Metadata Object](#metadataObject) | Provides optional metadata about the schematic.
 <a name="schematicWidth"></a>Width | `unsigned short` | **Required.** Specifies the width (the size of the area in the X-axis) of the schematic.
 <a name="schematicHeight"></a>Height | `unsigned short` | **Required.** Specifies the height (the size of the area in the Y-axis) of the schematic.
 <a name="schematicLength"></a>Length | `unsigned short` | **Required.** Specifies the length (the size of the area in the Z-axis) of the schematic.
-<a name="schematicOffset"></a>Offset | `integer`[3] |  **Required.** Specifies the relative offset of the schematic. This value is relative to the most minimal point in the schematics area. The default value if not provided is `[0, 0, 0]`. This may be used when incorporating the area of blocks defined by this schematic to a larger area to place the blocks relative to a selected point.
+<a name="schematicOffset"></a>Offset | `integer[3]` |  **Required.** Specifies the relative offset of the schematic. This value is relative to the most minimal point in the schematics area. The default value if not provided is `[0, 0, 0]`. This may be used when incorporating the area of blocks defined by this schematic to a larger area to place the blocks relative to a selected point.
 <a name="schematicPalette"></a>BlockPalette | [Palette Object](#paletteObject) |  **Required.** Specifies the block palette. This is a mapping of block states to indices which are local to this schematic. These indices are used to reference the block states from within the [BlockData array](#schematicBlockData). It is recommeneded for maximum data compression that your indices start at zero and skip no values.
 <a name="schematicBlockData"></a>BlockData | `varint[]` | **Required.** Specifies the main storage array which contains `Width * Height * Length` entries. Each entry is specified as a varint and refers to an index within the [Palette](#schematicPalette). The entries are indexed by `x + z * Width + y * Width * Length`.
 <a name="schematicBlockEntities"></a>BlockEntities | [BlockEntity Object](#blockEntityObject)[] | Specifies additional data for blocks which require extra data. If no additional data is provided for a block which normally requires extra data then it is assumed that the BlockEntity for the block is initialized to its default state.
@@ -106,7 +106,7 @@ Field Name | Type | Description
 <a name="metadataName"></a>Name | `string` | The name of the schematic.
 <a name="metadataAuthor"></a>Author | `string` | The name of the author of the schematic.
 <a name="metadataDate"></a>Date | `long` | The date that this schematic was created on. This is specified as milliseconds since the Unix epoch.
-<a name="metadataRequiredMods"></a>RequiredMods | `string`[] | An array of mod ids which have blocks which are referenced by this schematic's defined [Palette](#schematicPalette).
+<a name="metadataRequiredMods"></a>RequiredMods | `string[]` | An array of mod ids which have blocks which are referenced by this schematic's defined [Palette](#schematicPalette).
 
 ##### Metadata Object Example:
 
@@ -149,7 +149,7 @@ Field Pattern | Type | Description
 }
 ```
 
-#### <a name="blockEntityObject"></a>`BlockEntity` Object
+#### <a name="blockEntityObject"></a>BlockEntity Object
 
 An object to specify a `BlockEntity` which is within the region. Block entities are used by Minecraft to store additional data for a block (such as the lines of text on a sign). The fields used to describe a `BlockEntity` vary for each type, however the structure will be the same as used by the [Minecraft Chunk Format](http://minecraft.gamepedia.com/Chunk_format#Block_entity_format).
 
@@ -157,11 +157,11 @@ An object to specify a `BlockEntity` which is within the region. Block entities 
 
 Field Pattern | Type | Description
 ---|:---:|---
-<a name="blockEntityPos"></a>Pos | `integer`[3] | **Required.** The position of the `BlockEntity` relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffset) applied). Must contain exactly 3 integer values.
+<a name="blockEntityPos"></a>Pos | `integer[3]` | **Required.** The position of the `BlockEntity` relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffset) applied). Must contain exactly 3 integer values.
 <a name="blockEntityId"></a>Id | `string` | **Required.** The id of the `BlockEntity` type defined by this `BlockEntity` Object, specified as a [Resource Location](#defResourceLocation). This should be used to identify which fields should be required for the definition of this type.
 <a name="blockEntityExtra"></a>Extra | `extra` | **Optional** The extra information related to a `BlockEntity` Object that otherwise would define various bits of information for the `BlockEntity`. This can be formatted in any which way, and likely can change between Minecraft Data Versions.
 
-##### `BlockEntity` Object Example
+##### BlockEntity Object Example
 
 An example of possible storage of a sign. See the [Minecraft Chunk Format](http://minecraft.gamepedia.com/Chunk_format#Block_entity_format) for a complete listing of data used to store various types of block entities present in vanilla minecraft. Mods may store additional data or have additional types of block entities.
 
@@ -182,7 +182,7 @@ An object to specify an instance of an [entity type](#defEntityType) within the 
 ##### Fields
 Field Pattern | Type | Description
 ---|:---:|---
-<a name="entityPos"></a>Pos | `double`[3] | **Required.** The position of the entity relative to the [0, 0, 0] position of the schematic (without the offset applied). Must contain exactly 3 double values.
+<a name="entityPos"></a>Pos | `double[3]` | **Required.** The position of the entity relative to the `[0, 0, 0]` position of the schematic (without the offset applied). Must contain exactly 3 double values.
 <a name="entityId"></a>Id | `string` | **Required.** The id of the entity type defined by this Entity Object, specified as a [Resource Location](#defResouceLocation). This should be used to identify which fields should be required for the definition of this type.
 <a name="entityExtra"></a>Extra | `unknown` | **Optional** The extra information related to an entity that otherwise is either defaulted or required by the entity associated with the [entity type](#defEntityType)
 
