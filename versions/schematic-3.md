@@ -1,4 +1,4 @@
-# Sponge Schematic Specification
+ # Sponge Schematic Specification
 
 #### Version 3
 
@@ -72,6 +72,17 @@ The structure described by this specification is persisted to disk using the [Na
 
 All field names in the specification are **case sensitive**.
 
+Contained within an empty string root compound, is the `Schematic` compound, as described in the [Schematic](#schematicObject) schema, as follows:
+```json
+{
+    "": {
+        "Schematic": {
+            //...
+        }
+    }
+}
+```
+
 ### Schema
 
 #### <a name="schematicObject"></a>Schematic Object
@@ -132,6 +143,32 @@ An object which holds a mapping of a resourced id to an index.
 }
 ```
 
+##### BlockState Palette Specifics
+
+The format of the Block State identifier is the id of the block type and a set of comma-separated property `key=value` 
+pairs surrounded by square brackets. If the block has no properties then the square brackets can be omitted. The block
+type id is specified as a [Resource Location](#defResourceLocation), for a full list of available Block ID's, refer to 
+the particular Minecraft Java edition version of the official wiki.
+
+For example the air block has no properties so its id representation would be just the block type id `minecraft:air`. 
+The wheat block has an enum property for the `age` so its id would be `minecraft:wheat[age=3]`. 
+Properties ordering is nondeterministic, unknown properties for the particular game version may result in errors.
+
+##### Biome Palette Specifics
+
+Biomes are simply referenced by their game's particular [Resource Location](#defResourceLocation). Due to the nature of
+game specific registries, it's necessary to consider that a biome may not exist between different game versions or
+game setups, such that a biome may only exist as part of a [DataPack](https://minecraft.fandom.com/wiki/Data_Pack), or 
+mod. A full list of available biomes for the vanilla game are available [here](https://minecraft.fandom.com/wiki/Biome#Overworld).
+
+##### Fields
+
+Field Pattern | Type | Description
+---|:---:|---
+<a name="blockPaletteEntry"></a>{blockstate} | `integer` | A single entry mapping a blockstate to an index.
+<a name="biomePaletteEntry"></a>{biome} | `integer` | A single entry mapping a biome to an index
+
+
 #### <a name="blockContainer"></a> Block Container 
 
 An object which provides block based data and has particular requirements alone. Not all schematics need to consist of blocks.
@@ -155,17 +192,6 @@ Field Name | Type | Description
 <a name="schematicBiomePalette"></a>Palette | [Palette Object](#paletteObject) | **Required** Specifies the palette. This is a mapping of [biomes](#defBiome) to indices which are local to this schematic. These indices are used to reference the biomes from within the [Data](#schematicBiomeData) array. It is recommended for maximum data compression that your indices start at zero and skip no values.
 <a name="schematicBiomeData"></a>Data | `varint[]` | **Required** Specifies the main storage array which contains `Width * Height * Length` entries for `Biome`s at positions. Each entry is specified as a varint and refers to an index within the [Palette](#schematicBiomePalette). The entries are indexed by `x + z * Width + y * Width * Length`.
 
-#### Block State Ids
-
-The format of the Block State identifier is the id of the block type and a set of comma-separated property `key=value` pairs surrounded by square brackets. If the block has no properties then they can be excluded. The block type id is specified as a [Resource Location](#defResourceLocation).
-
-For example the air block has no properties so its id representation would be just the block type id `minecraft:air`. The planks block however has an enum property for the `variant` so its id would be `minecraft:planks[variant=oak]`. Properties should be ordered with their keys in alphabetical ordering.
-
-##### Fields
-
-Field Pattern | Type | Description
----|:---:|---
-<a name="paletteEntry"></a>{blockstate} | `integer` | A single entry mapping a blockstate to an index.
 
 #### <a name="blockEntityObject"></a>BlockEntity Object
 
@@ -177,7 +203,7 @@ Field Pattern | Type | Description
 ---|:---:|---
 <a name="blockEntityPos"></a>Pos | `integer[3]` | **Required.** The position of the `BlockEntity` relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffset) applied). Must contain exactly 3 integer values.
 <a name="blockEntityId"></a>Id | `string` | **Required.** The id of the `BlockEntity` type defined by this `BlockEntity` Object, specified as a [Resource Location](#defResourceLocation). This should be used to identify which fields should be required for the definition of this type.
-<a name="blockEntityExtra"></a>Extra | `extra` | **Optional** The extra information related to a `BlockEntity` Object that otherwise would define various bits of information for the `BlockEntity`. This can be formatted in any which way, and likely can change between Minecraft Data Versions.
+<a name="blockEntityExtra"></a>Extra | `unknown` | **Optional** The extra information related to a `BlockEntity` that otherwise would define various bits of information for the `BlockEntity` associated by their respective types.
 
 ##### BlockEntity Object Example
 
@@ -186,7 +212,7 @@ An example of possible storage of a sign. See the [Minecraft Chunk Format](http:
 ```json
 {
     "Pos": [0, 1, 0],
-    "Id": "minecraft:Sign",
+    "Id": "minecraft:sign",
     "Text1": "foo",
     "Text2": "",
     "Text3": "bar",
@@ -201,8 +227,8 @@ An object to specify an instance of an [entity type](#defEntityType) within the 
 Field Pattern | Type | Description
 ---|:---:|---
 <a name="entityPos"></a>Pos | `double[3]` | **Required.** The position of the entity relative to the `[0, 0, 0]` position of the schematic (without the offset applied). Must contain exactly 3 double values.
-<a name="entityId"></a>Id | `string` | **Required.** The id of the entity type defined by this Entity Object, specified as a [Resource Location](#defResouceLocation). This should be used to identify which fields should be required for the definition of this type.
-<a name="entityExtra"></a>Extra | `unknown` | **Optional** The extra information related to an entity that otherwise is either defaulted or required by the entity associated with the [entity type](#defEntityType)
+<a name="entityId"></a>Id | `string` | **Required.** The id of the entity type defined by this `Entity` Object, specified as a [Resource Location](#defResouceLocation). This should be used to identify which fields should be required for the definition of this type.
+<a name="entityExtra"></a>Extra | `unknown` | **Optional** The extra information related to an `Entity` that otherwise is either defaulted or required by the entity associated with the [entity type](#defEntityType)
 
 ##### Entity Object Example
 
