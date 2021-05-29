@@ -203,7 +203,7 @@ Field Pattern | Type | Description
 ---|:---:|---
 <a name="blockEntityPos"></a>Pos | `integer[3]` | **Required.** The position of the `BlockEntity` relative to the `[0, 0, 0]` position of the schematic (without the [offset](#schematicOffset) applied). Must contain exactly 3 integer values.
 <a name="blockEntityId"></a>Id | `string` | **Required.** The id of the `BlockEntity` type defined by this `BlockEntity` Object, specified as a [Resource Location](#defResourceLocation). This should be used to identify which fields should be required for the definition of this type.
-<a name="blockEntityExtra"></a>Extra | `unknown` | **Optional** The extra information related to a `BlockEntity` that otherwise would define various bits of information for the `BlockEntity` associated by their respective types.
+<a name="blockEntityData"></a>Data | `extra` | **Optional** The extra information related to a `BlockEntity` that otherwise would define various bits of information for the `BlockEntity` associated by their respective types.
 
 ##### BlockEntity Object Example
 
@@ -213,10 +213,12 @@ An example of possible storage of a sign. See the [Minecraft Chunk Format](http:
 {
     "Pos": [0, 1, 0],
     "Id": "minecraft:sign",
-    "Text1": "foo",
-    "Text2": "",
-    "Text3": "bar",
-    "Text4": ""
+    "Data": {
+        "Text1": "foo",
+        "Text2": "",
+        "Text3": "bar",
+        "Text4": ""
+    }
 }
 ```
 
@@ -228,7 +230,7 @@ Field Pattern | Type | Description
 ---|:---:|---
 <a name="entityPos"></a>Pos | `double[3]` | **Required.** The position of the entity relative to the `[0, 0, 0]` position of the schematic (without the offset applied). Must contain exactly 3 double values.
 <a name="entityId"></a>Id | `string` | **Required.** The id of the entity type defined by this `Entity` Object, specified as a [Resource Location](#defResouceLocation). This should be used to identify which fields should be required for the definition of this type.
-<a name="entityExtra"></a>Extra | `unknown` | **Optional** The extra information related to an `Entity` that otherwise is either defaulted or required by the entity associated with the [entity type](#defEntityType)
+<a name="entityData"></a>Data | `extra` | **Optional** The extra information related to an `Entity` that otherwise is either defaulted or required by the entity associated with the [entity type](#defEntityType)
 
 ##### Entity Object Example
 
@@ -238,11 +240,13 @@ An example of possible storage of a creeper. See the [Minecraft Chunk Format](ht
 {
     "Pos": [15.0043293, 68.000321, 40.452],
     "Id": "minecraft:creeper",
-    "Motion": [0.00203, 0.00203, 1.000], 
-    "Rotation": [189.30, 45],
-    "Fire": -20,
-    "NoGravity": 0,
-    "CustomName": "Sheep",
-    "CustomNameVisible": 1
+    "Data": {
+        "Motion": [0.00203, 0.00203, 1.000],
+        "Rotation": [189.30, 45],
+        "Fire": -20,
+        "NoGravity": 0,
+        "CustomName": "Sheep",
+        "CustomNameVisible": 1
+    }
 }
 ```
