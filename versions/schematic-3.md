@@ -23,13 +23,13 @@ Version | Date | Notes
 [Named Binary Tag](http://minecraft.gamepedia.com/NBT_format) (NBT) is a binary format used by Minecraft for various files and storage of data. Its many supported types are used throughout this specification as a means of what *expected* tags are used, and how the data is stored using the tag type.
 
 ##### <a name="defResourceLocation"></a>Resource Location
-Resources identified by a Resource Location have an identifier string which is made up of two sections, the domain and the resource name, written as `domain:name`. If the domain is not specified then it is assumed to be `minecraft`. For example `planks` would identify the same resource as `minecraft:planks` as the `minecraft:` prefix is implicit. Many examples of resource locations can be found [on the minecraft wiki for Java Edition](https://minecraft.gamepedia.com/Java_Edition_data_values).
+Resources identified by a Resource Location have an identifier string which is made up of two sections, the domain and the resource name, written as `domain:name`. If the domain is not specified then it is assumed to be `minecraft`. For example `planks` would identify the same resource as `minecraft:planks` as the `minecraft:` prefix is implicit. Many examples of resource locations can be found [on the Minecraft wiki for Java Edition](https://minecraft.gamepedia.com/Java_Edition_data_values).
 
 ##### <a name="defBlockState"></a>Block State
 A Block State is an instance of a block type with a set of extra data used to further define the material or properties. The additional data varies by block type and a complete listing of vanilla types is available [here](http://minecraft.gamepedia.com/Block_states). Mods can add additional block types and properties. A state is always referencable by a [resource location](#defResourceLocation).
 
 ##### <a name="defBlockEntity"></a>BlockEntity
-A special Entity that resides at a position with a correlated [blockstate](#defBlockState). Specifically, these are instances that can have complex data contained within them and may perform various operations in the world and as a result, their data is stored separately and otherwise too complex to store as a [`BlockState`](#defBlockState). Examples of these include chests, furnaces, beacons, etc. where their data is specific to each position they may exist. More information on these can be read on the [minecraft wiki](https://minecraft.gamepedia.com/Block_entity).
+A special Entity that resides at a position with a correlated [blockstate](#defBlockState). Specifically, these are instances that can have complex data contained within them and may perform various operations in the world and as a result, their data is stored separately and otherwise too complex to store as a [`BlockState`](#defBlockState). Examples of these include chests, furnaces, beacons, etc. where their data is specific to each position they may exist. More information on these can be read on the [Minecraft wiki](https://minecraft.gamepedia.com/Block_entity).
 
 ##### <a name="defEntityType"></a>Entity Type
 An Entity Type is a literal type of an `Entity` that is represented as a [Resource Location](#defResourceLocation). The additional data varies by entity type and a complete listing of vanilla types is available [here](https://minecraft.gamepedia.com/Java_Edition_data_values#Entity_IDs).
@@ -38,7 +38,7 @@ An Entity Type is a literal type of an `Entity` that is represented as a [Resour
 An instance of an [entity type](#defEntityType) that has a relative position to the origin of the schematic. Additional data is dependent on the type while vanilla optional data for entities can be found [here](https://minecraft.gamepedia.com/Chunk_format#Entity_format). Mods can add extra data to any entity instance. Each entity in a Minecraft game instance is uniquely identifable through a [`UUID`](https://docs.oracle.com/javase/6/docs/api/java/util/UUID.html), however schematics **can not** be relied on to provide a `UUID` for the targeted entity as common Minecraft implementations will generate a new `UUID` for each entity spawned from a schematic.
 
 ##### <a name="defBiome"></a>Biome
-A specific environmental aspect to a region that affects various rendering options, such as foliage coloring, rain, snow, temperature, mob spawning, and sometimes sky rendering. They do have potential physical effects based on implementation and are id'ed by [`ResourceLocation`s](#defResourceLocation). More about these can be read [on the minecraft wiki](https://minecraft.gamepedia.com/Biome).
+A specific environmental aspect to a region that affects various rendering options, such as foliage coloring, rain, snow, temperature, mob spawning, and sometimes sky rendering. They do have potential physical effects based on implementation and are id'ed by [`ResourceLocation`s](#defResourceLocation). More about these can be read [on the Minecraft wiki](https://minecraft.gamepedia.com/Biome).
 
 ## Data Types
 
@@ -61,7 +61,7 @@ Specification Data Type | NBT Equivalent | Format Stored to target NBT Equivalen
 `string[]` | `NBT List of NBT String` | No conversion
 `Object` | `NBT Compound` | No conversion, each object should serialize to supported types within a compound
 `Object[]` | `NBT List of NBT Compound` | No conversion, each `Object` is stored in an `NBT List` of `NBT Compound`s as indexed according to the `Object[]`.
-`extra` | `NBT Compound` | No conversion. Since extra data is stored within the same compound as the remaining data, there is no conversion.
+`extra` | `NBT Compound` | No conversion. The content of the compound is specified by Minecraft, not this format.
 
 
 ## Specification
@@ -72,7 +72,7 @@ The structure described by this specification is persisted to disk using the [Na
 
 All field names in the specification are **case sensitive**.
 
-Contained within an empty string root compound, is the `Schematic` compound, as described in the [Schematic](#schematicObject) schema, as follows:
+The [Schematic](#schematicObject) schema compound is nested inside the root compound, like with most of Minecraft's own data files:
 ```json
 {
     "": {
@@ -145,13 +145,13 @@ An object which holds a mapping of a resourced id to an index.
 
 ##### BlockState Palette Specifics
 
-The format of the Block State identifier is the id of the block type and a set of comma-separated property `key=value` 
+The format of the BlockState identifier is the id of the block type and a set of comma-separated property `key=value` 
 pairs surrounded by square brackets. If the block has no properties then the square brackets can be omitted. The block
-type id is specified as a [Resource Location](#defResourceLocation), for a full list of available Block ID's, refer to 
+type id is specified as a [Resource Location](#defResourceLocation), for a full list of available block IDs, refer to 
 the particular Minecraft Java edition version of the official wiki.
 
 For example the air block has no properties so its id representation would be just the block type id `minecraft:air`. 
-The wheat block has an enum property for the `age` so its id would be `minecraft:wheat[age=3]`. 
+The wheat block has an integer property for the `age` so its id would be `minecraft:wheat[age=3]`. 
 Properties ordering is nondeterministic, unknown properties for the particular game version may result in errors.
 
 ##### Biome Palette Specifics
